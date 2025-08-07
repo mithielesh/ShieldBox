@@ -473,12 +473,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log('[ShieldBox] 🟢 Auto-scan ENABLED via settings');
         scanningActive = true;
         startAutoScan();
-        showFloatingPanel();
       } else {
         console.log('[ShieldBox] 🔴 Auto-scan DISABLED via settings');
         scanningActive = false;
         stopAutoScan();
-        hideFloatingPanel();
       }
     }
 
@@ -624,6 +622,11 @@ function collectPageUrls() {
 
 // Function to scan collected URLs
 function scanCollectedUrls() {
+  if (!scanningActive || !autoScanEnabled) {
+    // console.log('[ShieldBox] Auto-scan is disabled, skipping URL collection.');
+    return;
+  }
+
   const urls = collectPageUrls();
   if (urls.length === 0) return;
 

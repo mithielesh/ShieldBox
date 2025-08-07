@@ -265,46 +265,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 let threatDetails = null;
 
                 // FIXED: Only use final processed statuses, not raw ML predictions
+
+                // Always use email_status for main classification (for both autoscan and manual scan)
                 const status = data.status?.toLowerCase() || 'unknown';
                 const emailStatus = data.email_status?.toLowerCase() || status;
 
-                console.log("[ShieldBox] Status mapping:", { status, emailStatus });
+                // Use emailStatus as the main result for consistency
+                backendResult = emailStatus || 'safe';
+                threatDetails = getThreatDetails(backendResult);
 
-                if (status === 'no_links') {
-                  // No links found in email - use email content analysis
-                  backendResult = emailStatus || 'safe';
-                  threatDetails = getThreatDetails(backendResult);
-                  threatDetails.description = "No links found in this email. Classification based on email content analysis.";
-                } else if (status === 'phishing' || emailStatus === 'phishing' || data.has_phishing) {
-                  // Phishing detected (either in links or email content)
-                  backendResult = 'phishing';
-                  threatDetails = getThreatDetails('phishing');
-
-                  // Add specific details about detected threats
+                // Add specific details for phishing, spam, fraud, malware, or safe
+                if (backendResult === 'phishing') {
                   if (data.has_phishing && data.phishing_link_count > 0) {
                     threatDetails.description = `Detected ${data.phishing_link_count} suspicious link(s) in this email that may be phishing attempts.`;
                     threatDetails.recommendation = "Avoid clicking any links in this email. Verify the sender's identity before taking any action.";
-                  } else if (emailStatus === 'phishing') {
+                  } else {
                     threatDetails.description = "Email content analysis detected phishing characteristics.";
                     threatDetails.recommendation = "This email appears to be a phishing attempt. Do not provide personal information or click links.";
                   }
-                } else if (status === 'spam' || emailStatus === 'spam') {
-                  // Spam email - only use processed statuses, not raw category
-                  backendResult = 'spam';
-                  threatDetails = getThreatDetails('spam');
+                } else if (backendResult === 'spam') {
                   threatDetails.description = "This email appears to be spam or promotional content.";
-                } else if (status === 'fraud' || emailStatus === 'fraud') {
-                  // Fraud email
-                  backendResult = 'fraud';
-                  threatDetails = getThreatDetails('fraud');
-                } else if (status === 'malware' || emailStatus === 'malware') {
-                  // Malware email
-                  backendResult = 'malware';
-                  threatDetails = getThreatDetails('malware');
-                } else {
-                  // Safe/legitimate email
-                  backendResult = 'safe';
-                  threatDetails = getThreatDetails('legitimate');
+                } else if (backendResult === 'fraud') {
+                  threatDetails.description = "This email appears to be a fraudulent message attempting financial deception.";
+                } else if (backendResult === 'malware') {
+                  threatDetails.description = "This email may contain malicious attachments or links to harmful software.";
+                } else if (backendResult === 'safe' || backendResult === 'legitimate') {
                   if (data.link_count > 0) {
                     threatDetails.description = `Scanned ${data.link_count} link(s) in this email - all appear legitimate.`;
                   } else {
@@ -312,7 +297,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                   }
                 }
 
-                console.log("[ShieldBox] Final result:", { backendResult, confidence: data.confidence });
+                console.log("[ShieldBox] Final result (consistent):", { backendResult, confidence: data.confidence });
 
                 sendResponse({
                   result: backendResult,
@@ -510,9 +495,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // Handle update auto scan settings
   if (message.action === "updateAutoScanSettings") {
-    if (message.data) {
+    // The payload can come from popup.js (message.data) or floatingpanel.js (message.settings)
+    const newSettings = message.data || message.settings;
+    if (newSettings) {
       const oldEnabled = autoScanSettings.enabled;
-      autoScanSettings = { ...autoScanSettings, ...message.data };
+      autoScanSettings = { ...autoScanSettings, ...newSettings };
 
       // Save to storage
       chrome.storage.sync.set({ autoScanSettings: autoScanSettings });
