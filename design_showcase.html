@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShieldBox Design Showcase - 18 Premium Styles (Light/Dark Toggle)</title>
+    <style>
+        /* Showcase Layout */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .showcase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .showcase-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .showcase-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .showcase-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .designs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .design-wrapper {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .design-wrapper:hover {
+            transform: translateY(-5px);
+        }
+
+        .design-title {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .extension-popup {
+            width: 320px;
+            min-height: 480px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Common Elements */
+        .popup-header {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .card-header {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .scan-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .scan-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .result-box {
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 12px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #34C759;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Theme Toggle Styling */
+        .theme-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .theme-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            transition: 0.4s;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-slider:before {
+            position: absolute;
+            content: "☀️";
+            height: 26px;
+            width: 26px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .theme-slider {
+            background: linear-gradient(45deg, #2c3e50, #4a5568);
+        }
+
+        input:checked + .theme-slider:before {
+            transform: translateX(30px);
+            content: "🌙";
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark-mode .theme-label {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-wrapper {
+            background: #2d3748;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode .design-title {
+            background: linear-gradient(45deg, #4a5568, #2d3748);
+            color: #e2e8f0;
+        }
+
+        /* Dark Mode for Individual Designs */
+        
+        /* Design 1 - iOS Glass Dark */
+        body.dark-mode .design-1 {
+            background: linear-gradient(135deg, rgba(45, 55, 72, 0.9), rgba(26, 32, 44, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-1 .card {
+            background: rgba(45, 55, 72, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .design-1 .scan-input {
+            background: rgba(26, 32, 44, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-1 .result-box {
+            background: rgba(45, 55, 72, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        /* Design 3 - Material Dark */
+        body.dark-mode .design-3 {
+            background: #1e1e1e;
+            color: #e1e1e1;
+        }
+
+        body.dark-mode .design-3 .card {
+            background: #2d2d2d;
+        }
+
+        body.dark-mode .design-3 .scan-input {
+            background: #2d2d2d;
+            border: 2px solid #555;
+            color: #e1e1e1;
+        }
+
+        body.dark-mode .design-3 .result-box {
+            background: #2d2d2d;
+            color: #e1e1e1;
+        }
+
+        /* Design 4 - Neumorphism Dark */
+        body.dark-mode .design-4 {
+            background: #2d3748;
+            color: #e2e8f0;
+            box-shadow: 9px 9px 16px #1a202c, -9px -9px 16px #4a5568;
+        }
+
+        body.dark-mode .design-4 .card {
+            background: #2d3748;
+            box-shadow: inset 5px 5px 10px #1a202c, inset -5px -5px 10px #4a5568;
+        }
+
+        body.dark-mode .design-4 .scan-btn {
+            background: #2d3748;
+            color: #e2e8f0;
+            box-shadow: 5px 5px 10px #1a202c, -5px -5px 10px #4a5568;
+        }
+
+        body.dark-mode .design-4 .scan-input {
+            background: #2d3748;
+            color: #e2e8f0;
+            box-shadow: inset 3px 3px 6px #1a202c, inset -3px -3px 6px #4a5568;
+        }
+
+        body.dark-mode .design-4 .result-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            box-shadow: inset 3px 3px 6px #1a202c, inset -3px -3px 6px #4a5568;
+        }
+
+        /* Design 6 - Minimalist Dark */
+        body.dark-mode .design-6 {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-6 .card {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+        }
+
+        body.dark-mode .design-6 .scan-btn {
+            background: #e2e8f0;
+            color: #1a202c;
+        }
+
+        body.dark-mode .design-6 .scan-input {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-6 .result-box {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            color: #e2e8f0;
+        }
+
+        /* Design 9 - Ocean Wave Dark */
+        body.dark-mode .design-9 {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%);
+        }
+
+        /* Design 11 - Pastel Dark */
+        body.dark-mode .design-11 {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #1a202c 100%);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-11 .card {
+            background: rgba(45, 55, 72, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .design-11 .scan-btn {
+            background: linear-gradient(45deg, #4a5568, #2d3748);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-11 .scan-input {
+            background: rgba(26, 32, 44, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .design-11 .result-box {
+            background: rgba(45, 55, 72, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+        }
+
+        /* DESIGN 1: Glassmorphism iOS */
+        .design-1 {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            color: #333;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .design-1 .card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .design-1 .scan-btn {
+            background: #007AFF;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+        }
+
+        .design-1 .result-box {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* DESIGN 2: Dark Cyberpunk */
+        .design-2 {
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            border: 2px solid #00ff9f;
+            border-radius: 15px;
+            padding: 20px;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+        }
+
+        .design-2 .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #00ff9f;
+            box-shadow: inset 0 0 10px rgba(0, 255, 159, 0.1);
+        }
+
+        .design-2 .scan-btn {
+            background: linear-gradient(45deg, #00ff9f, #00ccff);
+            color: #000;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .design-2 .result-box {
+            background: rgba(0, 255, 159, 0.1);
+            border: 1px solid #00ff9f;
+            color: #00ff9f;
+        }
+
+        .design-2 .popup-header {
+            color: #00ff9f;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+        }
+
+        /* DESIGN 3: Material Design 3 */
+        .design-3 {
+            background: #fefbff;
+            border-radius: 24px;
+            padding: 20px;
+            color: #1c1b1f;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .design-3 .card {
+            background: #f7f2fa;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        }
+
+        .design-3 .scan-btn {
+            background: #6750a4;
+            color: white;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .design-3 .result-box {
+            background: #e8def8;
+            color: #1c1b1f;
+            border: none;
+        }
+
+        .design-3 .scan-input {
+            background: #f7f2fa;
+            border: 2px solid #79747e;
+            border-radius: 12px;
+        }
+
+        .design-3 .scan-input:focus {
+            border-color: #6750a4;
+            outline: none;
+        }
+
+        /* DESIGN 4: Neumorphism */
+        .design-4 {
+            background: #e0e5ec;
+            border-radius: 20px;
+            padding: 20px;
+            color: #333;
+            box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
+        }
+
+        .design-4 .card {
+            background: #e0e5ec;
+            border: none;
+            box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
+        }
+
+        .design-4 .scan-btn {
+            background: #e0e5ec;
+            color: #333;
+            box-shadow: 5px 5px 10px #a3b1c6, -5px -5px 10px #ffffff;
+            border: none;
+        }
+
+        .design-4 .scan-btn:active {
+            box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
+        }
+
+        .design-4 .result-box {
+            background: #e0e5ec;
+            box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
+            border: none;
+        }
+
+        .design-4 .scan-input {
+            background: #e0e5ec;
+            box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
+            border: none;
+        }
+
+        /* DESIGN 5: Gradient Vibrant */
+        .design-5 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .design-5::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .design-5 > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .design-5 .card {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .design-5 .scan-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .design-5 .result-box {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* DESIGN 6: Minimalist Monochrome */
+        .design-6 {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
+            color: #000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .design-6 .card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+        }
+
+        .design-6 .scan-btn {
+            background: #000;
+            color: white;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .design-6 .result-box {
+            background: #f5f5f5;
+            border: 1px solid #e5e5e5;
+        }
+
+        .design-6 .scan-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .design-6 .scan-input:focus {
+            border-color: #000;
+            outline: none;
+        }
+
+        /* DESIGN 7: Retro Gaming */
+        .design-7 {
+            background: #2d1b69;
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 20px;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+            font-family: 'Courier New', monospace;
+        }
+
+        .design-7 .card {
+            background: #1a0f3e;
+            border: 2px solid #4ecdc4;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(78, 205, 196, 0.2);
+        }
+
+        .design-7 .scan-btn {
+            background: #ff6b6b;
+            color: white;
+            border: 2px solid #ff6b6b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-family: inherit;
+        }
+
+        .design-7 .scan-btn:hover {
+            background: transparent;
+            color: #ff6b6b;
+        }
+
+        .design-7 .result-box {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ecdc4;
+            color: #4ecdc4;
+            font-family: inherit;
+        }
+
+        .design-7 .popup-header {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        .design-7 .scan-input {
+            background: #1a0f3e;
+            border: 2px solid #4ecdc4;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .design-7 .scan-input::placeholder {
+            color: #4ecdc4;
+        }
+
+        /* DESIGN 8: Luxury Gold */
+        .design-8 {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border: 2px solid #d4af37;
+            border-radius: 16px;
+            padding: 20px;
+            color: #f5f5f5;
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            position: relative;
+        }
+
+        .design-8::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .design-8 .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 0 rgba(212, 175, 55, 0.1);
+        }
+
+        .design-8 .scan-btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #1a1a1a;
+            font-weight: 700;
+            text-shadow: none;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .design-8 .result-box {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #d4af37;
+        }
+
+        .design-8 .popup-header {
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            font-weight: 700;
+        }
+
+        .design-8 .scan-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #f5f5f5;
+        }
+
+        .design-8 .scan-input::placeholder {
+            color: rgba(212, 175, 55, 0.7);
+        }
+
+        /* DESIGN 9: Ocean Wave */
+        .design-9 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .design-9::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+            animation: wave 20s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .design-9 > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .design-9 .card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .design-9 .scan-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .design-9 .scan-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .design-9 .result-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .design-9 .scan-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .design-9 .scan-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* DESIGN 10: Neon Terminal */
+        .design-10 {
+            background: #0d1117;
+            border: 2px solid #39ff14;
+            border-radius: 8px;
+            padding: 20px;
+            color: #39ff14;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3), inset 0 0 30px rgba(57, 255, 20, 0.05);
+            position: relative;
+        }
+
+        .design-10::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #39ff14, transparent);
+            animation: scan-line 3s ease-in-out infinite;
+        }
+
+        @keyframes scan-line {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .design-10 .card {
+            background: rgba(57, 255, 20, 0.05);
+            border: 1px solid #39ff14;
+            border-radius: 4px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .design-10 .card::before {
+            content: '> ';
+            position: absolute;
+            left: -15px;
+            top: 12px;
+            color: #39ff14;
+        }
+
+        .design-10 .scan-btn {
+            background: transparent;
+            color: #39ff14;
+            border: 2px solid #39ff14;
+            font-family: inherit;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .design-10 .scan-btn:hover {
+            background: #39ff14;
+            color: #0d1117;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+        }
+
+        .design-10 .result-box {
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid #39ff14;
+            font-family: inherit;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        .design-10 .popup-header {
+            text-align: center;
+            font-family: inherit;
+            text-shadow: 0 0 10px #39ff14;
+            border-bottom: 1px solid #39ff14;
+            padding-bottom: 10px;
+        }
+
+        .design-10 .scan-input {
+            background: transparent;
+            border: 1px solid #39ff14;
+            color: #39ff14;
+            font-family: inherit;
+        }
+
+        .design-10 .scan-input::placeholder {
+            color: rgba(57, 255, 20, 0.6);
+        }
+
+        /* DESIGN 11: Pastel Dream */
+        .design-11 {
+            background: linear-gradient(135deg, #ffeef8 0%, #f0e6ff 50%, #e6f3ff 100%);
+            border-radius: 24px;
+            padding: 20px;
+            color: #6b5b95;
+            box-shadow: 0 10px 40px rgba(107, 91, 149, 0.1);
+            position: relative;
+        }
+
+        .design-11::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.3), transparent);
+            border-radius: 50%;
+            filter: blur(20px);
+        }
+
+        .design-11 .card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(107, 91, 149, 0.1);
+        }
+
+        .design-11 .scan-btn {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: #6b5b95;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        }
+
+        .design-11 .result-box {
+            background: rgba(255, 182, 193, 0.2);
+            border: 1px solid rgba(255, 182, 193, 0.4);
+            color: #6b5b95;
+        }
+
+        .design-11 .popup-header {
+            color: #6b5b95;
+            font-weight: 700;
+        }
+
+        .design-11 .scan-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(255, 182, 193, 0.4);
+            color: #6b5b95;
+            border-radius: 15px;
+        }
+
+        .design-11 .scan-input:focus {
+            border-color: #ff9a9e;
+            box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.2);
+        }
+
+        /* DESIGN 12: Forest Green */
+        .design-12 {
+            background: linear-gradient(135deg, #2d5016 0%, #3e6b1f 50%, #4a7c23 100%);
+            border: 2px solid #7cb342;
+            border-radius: 16px;
+            padding: 20px;
+            color: #c8e6c9;
+            box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3);
+            position: relative;
+        }
+
+        .design-12::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(124, 179, 66, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 179, 66, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .design-12 .card {
+            background: rgba(124, 179, 66, 0.1);
+            border: 1px solid rgba(124, 179, 66, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        .design-12 .scan-btn {
+            background: #7cb342;
+            color: #1b5e20;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(124, 179, 66, 0.4);
+        }
+
+        .design-12 .result-box {
+            background: rgba(124, 179, 66, 0.15);
+            border: 1px solid rgba(124, 179, 66, 0.4);
+            color: #c8e6c9;
+        }
+
+        .design-12 .popup-header {
+            color: #7cb342;
+            font-weight: 700;
+        }
+
+        .design-12 .scan-input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 179, 66, 0.5);
+            color: #c8e6c9;
+        }
+
+        .design-12 .scan-input::placeholder {
+            color: rgba(200, 230, 201, 0.7);
+        }
+
+        /* DESIGN 13: Arctic Ice */
+        .design-13 {
+            background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 50%, #ffffff 100%);
+            border: 2px solid #87ceeb;
+            border-radius: 20px;
+            padding: 20px;
+            color: #1e3a8a;
+            box-shadow: 0 8px 32px rgba(135, 206, 235, 0.3);
+        }
+
+        .design-13 .card {
+            background: rgba(135, 206, 235, 0.1);
+            border: 1px solid rgba(135, 206, 235, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .design-13 .scan-btn {
+            background: #87ceeb;
+            color: #1e3a8a;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
+        }
+
+        .design-13 .result-box {
+            background: rgba(135, 206, 235, 0.15);
+            border: 1px solid rgba(135, 206, 235, 0.4);
+            color: #1e3a8a;
+        }
+
+        .design-13 .popup-header {
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        .design-13 .scan-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(135, 206, 235, 0.5);
+            color: #1e3a8a;
+        }
+
+        body.dark-mode .design-13 {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            border: 2px solid #38bdf8;
+            color: #e0f2fe;
+        }
+
+        body.dark-mode .design-13 .card {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        body.dark-mode .design-13 .scan-btn {
+            background: #38bdf8;
+            color: #0f172a;
+        }
+
+        body.dark-mode .design-13 .result-box {
+            background: rgba(56, 189, 248, 0.15);
+            color: #e0f2fe;
+        }
+
+        body.dark-mode .design-13 .scan-input {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #e0f2fe;
+        }
+
+        /* DESIGN 14: Sunset Orange */
+        .design-14 {
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 50%, #fb923c 100%);
+            border: 2px solid #f97316;
+            border-radius: 20px;
+            padding: 20px;
+            color: #9a3412;
+            box-shadow: 0 8px 32px rgba(249, 115, 22, 0.3);
+        }
+
+        .design-14 .card {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .design-14 .scan-btn {
+            background: linear-gradient(45deg, #f97316, #fb923c);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+        }
+
+        .design-14 .result-box {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.4);
+            color: #9a3412;
+        }
+
+        body.dark-mode .design-14 {
+            background: linear-gradient(135deg, #451a03 0%, #7c2d12 50%, #9a3412 100%);
+            border: 2px solid #fb923c;
+            color: #fed7aa;
+        }
+
+        body.dark-mode .design-14 .card {
+            background: rgba(251, 146, 60, 0.1);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+        }
+
+        body.dark-mode .design-14 .result-box {
+            background: rgba(251, 146, 60, 0.15);
+            color: #fed7aa;
+        }
+
+        /* DESIGN 15: Purple Galaxy */
+        .design-15 {
+            background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 50%, #c084fc 100%);
+            border: 2px solid #a855f7;
+            border-radius: 20px;
+            padding: 20px;
+            color: #581c87;
+            box-shadow: 0 8px 32px rgba(168, 85, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .design-15::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(192, 132, 252, 0.1) 0%, transparent 50%);
+            animation: galaxyRotate 30s linear infinite;
+        }
+
+        @keyframes galaxyRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .design-15 .card {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .design-15 .scan-btn {
+            background: linear-gradient(45deg, #a855f7, #c084fc);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        body.dark-mode .design-15 {
+            background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #5b21b6 100%);
+            border: 2px solid #c084fc;
+            color: #e9d5ff;
+        }
+
+        body.dark-mode .design-15 .card {
+            background: rgba(192, 132, 252, 0.1);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+
+        /* DESIGN 16: Steam Punk */
+        .design-16 {
+            background: linear-gradient(135deg, #78716c 0%, #a8a29e 50%, #d6d3d1 100%);
+            border: 3px solid #a16207;
+            border-radius: 15px;
+            padding: 20px;
+            color: #451a03;
+            box-shadow: 0 8px 32px rgba(161, 98, 7, 0.3);
+            font-family: 'Georgia', serif;
+            position: relative;
+        }
+
+        .design-16::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #a16207, #78716c);
+            border-radius: 50%;
+            border: 2px solid #451a03;
+        }
+
+        .design-16 .card {
+            background: rgba(161, 98, 7, 0.1);
+            border: 2px solid #a16207;
+            border-radius: 8px;
+        }
+
+        .design-16 .scan-btn {
+            background: linear-gradient(45deg, #a16207, #d97706);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-family: inherit;
+            border: 2px solid #a16207;
+        }
+
+        body.dark-mode .design-16 {
+            background: linear-gradient(135deg, #1c1917 0%, #292524 50%, #44403c 100%);
+            border: 3px solid #d97706;
+            color: #fbbf24;
+        }
+
+        body.dark-mode .design-16 .card {
+            background: rgba(217, 119, 6, 0.1);
+            border: 2px solid #d97706;
+        }
+
+        /* DESIGN 17: Ruby Red */
+        .design-17 {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 50%, #f87171 100%);
+            border: 2px solid #dc2626;
+            border-radius: 20px;
+            padding: 20px;
+            color: #7f1d1d;
+            box-shadow: 0 8px 32px rgba(220, 38, 38, 0.3);
+        }
+
+        .design-17 .card {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .design-17 .scan-btn {
+            background: linear-gradient(45deg, #dc2626, #f87171);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        body.dark-mode .design-17 {
+            background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
+            border: 2px solid #f87171;
+            color: #fecaca;
+        }
+
+        body.dark-mode .design-17 .card {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        /* DESIGN 18: Electric Blue */
+        .design-18 {
+            background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 50%, #3b82f6 100%);
+            border: 2px solid #1d4ed8;
+            border-radius: 20px;
+            padding: 20px;
+            color: #1e3a8a;
+            box-shadow: 0 8px 32px rgba(29, 78, 216, 0.3);
+            position: relative;
+        }
+
+        .design-18::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                rgba(59, 130, 246, 0.1) 20px,
+                rgba(59, 130, 246, 0.1) 40px
+            );
+            animation: electricFlow 2s linear infinite;
+        }
+
+        @keyframes electricFlow {
+            0% { transform: translateX(-40px); }
+            100% { transform: translateX(0px); }
+        }
+
+        .design-18 .card {
+            background: rgba(29, 78, 216, 0.1);
+            border: 1px solid rgba(29, 78, 216, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .design-18 .scan-btn {
+            background: linear-gradient(45deg, #1d4ed8, #3b82f6);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
+        }
+
+        body.dark-mode .design-18 {
+            background: linear-gradient(135deg, #0c1445 0%, #1e3a8a 50%, #1d4ed8 100%);
+            border: 2px solid #3b82f6;
+            color: #bfdbfe;
+        }
+
+        body.dark-mode .design-18 .card {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-safe { background: #34C759; }
+        .status-warning { background: #FF9500; }
+        .status-danger { background: #FF3B30; }
+        .status-scanning { background: #007AFF; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .footer-note {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-container">
+        <div class="showcase-header">
+            <h1>🛡️ ShieldBox Design Showcase</h1>
+            <p>18 Premium Design Styles - Dynamic Light/Dark Mode Toggle</p>
+            
+            <!-- Theme Toggle -->
+            <div class="theme-toggle-container">
+                <span class="theme-label">☀️ Light</span>
+                <label class="theme-switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="theme-slider"></span>
+                </label>
+                <span class="theme-label">🌙 Dark</span>
+            </div>
+        </div>
+
+        <div class="designs-grid">
+            <!-- DESIGN 1: Glassmorphism iOS -->
+            <div class="design-wrapper">
+                <div class="design-title">1. Glassmorphism iOS - Premium Apple Style</div>
+                <div class="extension-popup design-1">
+                    <div class="popup-header">🛡️ Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Manual Link Scan</div>
+                        <input type="text" class="scan-input" placeholder="Paste URL here...">
+                        <button class="scan-btn">Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>URL is safe to visit
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">⚙️ Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Scan</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Show Notifications</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Analysis</div>
+                        <button class="scan-btn">Scan Current Email</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-scanning"></span>Scanning email...
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Auto Scan Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Protection active - 3 threats blocked today
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 2: Dark Cyberpunk -->
+            <div class="design-wrapper">
+                <div class="design-title">2. Dark Cyberpunk - Futuristic Security</div>
+                <div class="extension-popup design-2">
+                    <div class="popup-header">⚡ SHIELD BOX</div>
+                    
+                    <div class="card">
+                        <div class="card-header">>> MANUAL SCAN</div>
+                        <input type="text" class="scan-input" placeholder="Enter target URL...">
+                        <button class="scan-btn">INITIATE SCAN</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>TARGET SECURE
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">>> SYSTEM CONFIG</div>
+                        <div class="toggle-row">
+                            <span>AUTO DEFENSE</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>ALERT SYSTEM</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">>> EMAIL ANALYSIS</div>
+                        <button class="scan-btn">ANALYZE EMAIL</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-warning"></span>POTENTIAL THREAT DETECTED
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">>> DEFENSE STATUS</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>SHIELDS UP - SYSTEM OPERATIONAL
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 3: Material Design 3 -->
+            <div class="design-wrapper">
+                <div class="design-title">3. Material Design 3 - Google's Latest</div>
+                <div class="extension-popup design-3">
+                    <div class="popup-header">🛡️ Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Manual Link Scan</div>
+                        <input type="text" class="scan-input" placeholder="Paste URL here...">
+                        <button class="scan-btn">Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>This link is safe to visit
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Settings</div>
+                        <div class="toggle-row">
+                            <span>Auto Scan</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Notifications</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Protection</div>
+                        <button class="scan-btn">Scan Current Email</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>No threats found in current email
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Protection Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>All systems operational
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 4: Neumorphism -->
+            <div class="design-wrapper">
+                <div class="design-title">4. Neumorphism - Soft & Tactile</div>
+                <div class="extension-popup design-4">
+                    <div class="popup-header">🛡️ Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Manual Link Scan</div>
+                        <input type="text" class="scan-input" placeholder="Paste URL here...">
+                        <button class="scan-btn">Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>URL verification complete
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Scan</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Notifications</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Analysis</div>
+                        <button class="scan-btn">Scan Email</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Email appears safe
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Protection enabled
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 5: Gradient Vibrant -->
+            <div class="design-wrapper">
+                <div class="design-title">5. Gradient Vibrant - Colorful & Modern</div>
+                <div class="extension-popup design-5">
+                    <div class="popup-header">🛡️ Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Manual Link Scan</div>
+                        <input type="text" class="scan-input" placeholder="Paste URL here...">
+                        <button class="scan-btn">Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Safe to proceed
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Scan</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Notifications</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Protection</div>
+                        <button class="scan-btn">Scan Email</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-warning"></span>Suspicious content detected
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Auto Scan Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Active protection mode
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 6: Minimalist Monochrome -->
+            <div class="design-wrapper">
+                <div class="design-title">6. Minimalist Monochrome - Clean & Simple</div>
+                <div class="extension-popup design-6">
+                    <div class="popup-header">Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Manual Link Scan</div>
+                        <input type="text" class="scan-input" placeholder="Paste URL here...">
+                        <button class="scan-btn">Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>URL is safe
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Scan</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Notifications</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Analysis</div>
+                        <button class="scan-btn">Scan Email</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>No threats detected
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Protection active
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 7: Retro Gaming -->
+            <div class="design-wrapper">
+                <div class="design-title">7. Retro Gaming - 80s Nostalgia</div>
+                <div class="extension-popup design-7">
+                    <div class="popup-header">[ SHIELD BOX ]</div>
+                    
+                    <div class="card">
+                        <div class="card-header">// MANUAL SCAN</div>
+                        <input type="text" class="scan-input" placeholder="Enter URL...">
+                        <button class="scan-btn">EXECUTE</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>> SECURE_CONNECTION
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">// CONFIG</div>
+                        <div class="toggle-row">
+                            <span>AUTO_SCAN</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>ALERTS</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">// EMAIL_SCAN</div>
+                        <button class="scan-btn">ANALYZE</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-danger"></span>> THREAT_DETECTED
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">// STATUS</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>> SYSTEM_ONLINE
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 8: Luxury Gold -->
+            <div class="design-wrapper">
+                <div class="design-title">8. Luxury Gold - Premium & Elegant</div>
+                <div class="extension-popup design-8">
+                    <div class="popup-header">👑 SHIELD BOX</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Premium Link Analysis</div>
+                        <input type="text" class="scan-input" placeholder="Enter premium URL...">
+                        <button class="scan-btn">Analyze</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Verified Premium Security
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Elite Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Guardian</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>VIP Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Executive Email Shield</div>
+                        <button class="scan-btn">Premium Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Executive protection active
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Gold Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Premium shield operational
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 9: Ocean Wave -->
+            <div class="design-wrapper">
+                <div class="design-title">9. Ocean Wave - Fluid & Dynamic</div>
+                <div class="extension-popup design-9">
+                    <div class="popup-header">� Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Wave Scanner</div>
+                        <input type="text" class="scan-input" placeholder="Dive into URL analysis...">
+                        <button class="scan-btn">Scan Wave</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Calm waters detected
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Flow Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Flow</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Wave Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Tide</div>
+                        <button class="scan-btn">Ride the Wave</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-scanning"></span>Surfing email currents...
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Ocean Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Smooth sailing ahead
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 10: Neon Terminal -->
+            <div class="design-wrapper">
+                <div class="design-title">10. Neon Terminal - Hacker Matrix</div>
+                <div class="extension-popup design-10">
+                    <div class="popup-header">[ SHIELD_BOX_v2.1 ]</div>
+                    
+                    <div class="card">
+                        <div class="card-header">// LINK_PARSER</div>
+                        <input type="text" class="scan-input" placeholder="Enter target URL...">
+                        <button class="scan-btn">exec scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>> connection_secure
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">// SYSTEM_CONFIG</div>
+                        <div class="toggle-row">
+                            <span>auto_scan</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>notify_sys</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">// EMAIL_MODULE</div>
+                        <button class="scan-btn">run email_scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-warning"></span>> threat_detected
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">// STATUS_LOG</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>> all_systems_green
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 11: Pastel Dream -->
+            <div class="design-wrapper">
+                <div class="design-title">11. Pastel Dream - Soft & Dreamy</div>
+                <div class="extension-popup design-11">
+                    <div class="popup-header">🌸 Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Gentle Link Check</div>
+                        <input type="text" class="scan-input" placeholder="Share your URL softly...">
+                        <button class="scan-btn">Gentle Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Sweet dreams, no threats
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Dreamy Settings</div>
+                        <div class="toggle-row">
+                            <span>Auto Dreams</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Soft Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Whispers</div>
+                        <button class="scan-btn">Whisper Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Peaceful email vibes
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Dream Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>In a peaceful dream state
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 12: Forest Green -->
+            <div class="design-wrapper">
+                <div class="design-title">12. Forest Green - Natural & Organic</div>
+                <div class="extension-popup design-12">
+                    <div class="popup-header">🌲 Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Nature's URL Filter</div>
+                        <input type="text" class="scan-input" placeholder="Plant your URL here...">
+                        <button class="scan-btn">Grow Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Fresh and clean, like morning dew
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Forest Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Growth</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Bird Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Photosynthesis</div>
+                        <button class="scan-btn">Photosynthesize</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Converting threats to oxygen
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Ecosystem Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Forest thriving, all creatures safe
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 13: Arctic Ice -->
+            <div class="design-wrapper">
+                <div class="design-title">13. Arctic Ice - Cool & Crisp</div>
+                <div class="extension-popup design-13">
+                    <div class="popup-header">❄️ Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Frozen URL Scanner</div>
+                        <input type="text" class="scan-input" placeholder="Freeze malicious URLs...">
+                        <button class="scan-btn">Ice Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Frozen solid - no threats
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Glacial Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Freeze</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Blizzard Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Avalanche</div>
+                        <button class="scan-btn">Arctic Analysis</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Crystal clear and secure
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Polar Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Arctic shield active
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 14: Sunset Orange -->
+            <div class="design-wrapper">
+                <div class="design-title">14. Sunset Orange - Warm & Energetic</div>
+                <div class="extension-popup design-14">
+                    <div class="popup-header">🌅 Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Dawn URL Check</div>
+                        <input type="text" class="scan-input" placeholder="Rise with secure URLs...">
+                        <button class="scan-btn">Sunrise Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Bright and safe horizon
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Solar Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Dawn</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Solar Flare Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Eclipse</div>
+                        <button class="scan-btn">Solar Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-warning"></span>Solar storm detected
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Daylight Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Golden hour protection
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 15: Purple Galaxy -->
+            <div class="design-wrapper">
+                <div class="design-title">15. Purple Galaxy - Cosmic & Mysterious</div>
+                <div class="extension-popup design-15">
+                    <div class="popup-header">🌌 Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Stellar URL Portal</div>
+                        <input type="text" class="scan-input" placeholder="Journey through safe space...">
+                        <button class="scan-btn">Cosmic Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Clear stellar navigation
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Galactic Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Orbit</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Nebula Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Constellation</div>
+                        <button class="scan-btn">Starlight Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Stars aligned safely
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Universe Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Cosmic harmony achieved
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 16: Steam Punk -->
+            <div class="design-wrapper">
+                <div class="design-title">16. Steam Punk - Industrial & Vintage</div>
+                <div class="extension-popup design-16">
+                    <div class="popup-header">⚙️ SHIELD BOX</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Mechanical URL Engine</div>
+                        <input type="text" class="scan-input" placeholder="Feed the steam engine...">
+                        <button class="scan-btn">Steam Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Gears turning smoothly
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Brass Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Steam</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Pressure Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Boiler</div>
+                        <button class="scan-btn">Fire Engine</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Pressure normal, no leaks
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Engine Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Full steam ahead!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 17: Ruby Red -->
+            <div class="design-wrapper">
+                <div class="design-title">17. Ruby Red - Bold & Powerful</div>
+                <div class="extension-popup design-17">
+                    <div class="popup-header">💎 Shield Box</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Gem URL Detector</div>
+                        <input type="text" class="scan-input" placeholder="Polish your URLs...">
+                        <button class="scan-btn">Ruby Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Flawless gem quality
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Jewel Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Polish</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Crystal Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Prism</div>
+                        <button class="scan-btn">Gemstone Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-danger"></span>Crack detected in crystal
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Precious Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Ruby shield gleaming
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESIGN 18: Electric Blue -->
+            <div class="design-wrapper">
+                <div class="design-title">18. Electric Blue - High Voltage & Dynamic</div>
+                <div class="extension-popup design-18">
+                    <div class="popup-header">⚡ SHIELD BOX</div>
+                    
+                    <div class="card">
+                        <div class="card-header">Lightning URL Strike</div>
+                        <input type="text" class="scan-input" placeholder="Electrify your security...">
+                        <button class="scan-btn">Thunder Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Lightning fast and clean
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Electric Controls</div>
+                        <div class="toggle-row">
+                            <span>Auto Charge</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Storm Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Email Tesla Coil</div>
+                        <button class="scan-btn">Electric Scan</button>
+                        <div class="result-box">
+                            <span class="status-indicator status-warning"></span>High voltage detected
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Power Status</div>
+                        <div class="result-box">
+                            <span class="status-indicator status-safe"></span>Full power, stable current
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <h3>� Dark Mode Design Collection</h3>
+            <p><strong>Dark Professional:</strong> #2 (Cyberpunk), #8 (Luxury Gold), #10 (Neon Terminal)</p>
+            <p><strong>Dark Creative:</strong> #7 (Retro Gaming), #12 (Forest Green)</p>
+            <p><strong>Light Professional:</strong> #1 (iOS Glass), #3 (Material), #6 (Minimalist)</p>
+            <p><strong>Colorful/Unique:</strong> #4 (Neumorphism), #5 (Gradient), #9 (Ocean Wave), #11 (Pastel Dream)</p>
+            <br>
+            <p>✨ <strong>5 Dark Mode Designs</strong> specifically crafted for low-light environments</p>
+            <p>All 12 designs maintain full functionality: Manual scanning, auto-scan toggles, email analysis, and status monitoring.</p>
+            <p><em>Perfect for developers, night owls, and professional dark theme users!</em></p>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Load saved theme preference
+        const savedTheme = localStorage.getItem('shieldbox-theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        // Handle theme toggle
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('shieldbox-theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('shieldbox-theme', 'light');
+            }
+        });
+
+        // Make toggles interactive
+        document.querySelectorAll('.switch input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                console.log('Toggle changed:', this.checked);
+            });
+        });
+
+        // Make buttons interactive
+        document.querySelectorAll('.scan-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const resultBox = this.parentElement.querySelector('.result-box');
+                const indicator = resultBox.querySelector('.status-indicator');
+                
+                // Show scanning state
+                indicator.className = 'status-indicator status-scanning';
+                resultBox.innerHTML = '<span class="status-indicator status-scanning"></span>Scanning...';
+                
+                // Simulate scan completion
+                setTimeout(() => {
+                    const results = [
+                        '<span class="status-indicator status-safe"></span>URL is safe to visit',
+                        '<span class="status-indicator status-warning"></span>Suspicious content detected',
+                        '<span class="status-indicator status-danger"></span>Phishing attempt blocked',
+                        '<span class="status-indicator status-safe"></span>No threats found'
+                    ];
+                    resultBox.innerHTML = results[Math.floor(Math.random() * results.length)];
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

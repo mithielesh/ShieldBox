@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shield Box</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="floating-container">
+    <div class="panel-header">
+      <span>Shield Box</span>
+      <div class="dark-toggle-container">
+        <span>Dark Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="urlInput" class="label-title">Manual Link Scan</label>
+      <input type="text" id="urlInput" placeholder="Paste link to scan..." />
+      <button id="scanBtn">Scan</button>
+      <div id="manual-link-result" class="result-box">No activity yet</div>
+    </div>
+
+    <div class="card">
+      <label class="label-title">Email Protection</label>
+      <button id="scanEmailBtn">Scan Current Email</button>
+      <div id="manual-email-result" class="result-box">No email scanned yet</div>
+    </div>
+    <div class="card">
+      <div class="label-title">Controls</div>
+      <div class="toggle-row">
+        <span>Auto Scan</span>
+        <label class="switch">
+          <input type="checkbox" id="autoScanToggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span>IoT Alerts</span>
+        <label class="switch">
+          <input type="checkbox" id="iotToggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label-title">Auto Scan Result</div>
+      <div id="auto-scan-result" class="result-box">No activity yet</div>
+    </div>
+  </div>
+</body>
+
+</html>

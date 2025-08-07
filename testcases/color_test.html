@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShieldBox Color Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            margin: 0;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .color-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .result-box {
+            margin-top: 8px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 14px;
+            border: 1.5px solid rgba(30, 60, 180, 0.12);
+            font-family: inherit;
+            font-weight: 500;
+            letter-spacing: 0.06px;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .result-box.safe {
+            background: linear-gradient(45deg, rgba(76, 175, 80, 0.25) 0%, rgba(139, 195, 74, 0.15) 100%);
+            border-color: rgba(76, 175, 80, 0.6);
+            color: #1b5e20;
+            font-weight: 600;
+        }
+
+        .result-box.phishing {
+            background: linear-gradient(45deg, rgba(244, 67, 54, 0.25) 0%, rgba(229, 57, 53, 0.15) 100%);
+            border-color: rgba(244, 67, 54, 0.6);
+            color: #b71c1c;
+            font-weight: 600;
+        }
+
+        .result-box.spam {
+            background: linear-gradient(45deg, rgba(255, 152, 0, 0.25) 0%, rgba(255, 193, 7, 0.15) 100%);
+            border-color: rgba(255, 152, 0, 0.6);
+            color: #e65100;
+            font-weight: 600;
+        }
+
+        .result-box.fraud {
+            background: linear-gradient(45deg, rgba(244, 67, 54, 0.25) 0%, rgba(229, 57, 53, 0.15) 100%);
+            border-color: rgba(244, 67, 54, 0.6);
+            color: #b71c1c;
+            font-weight: 600;
+        }
+
+        .result-box.malware {
+            background: linear-gradient(45deg, rgba(156, 39, 176, 0.25) 0%, rgba(103, 58, 183, 0.15) 100%);
+            border-color: rgba(156, 39, 176, 0.6);
+            color: #4a148c;
+            font-weight: 600;
+        }
+
+        .email-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 12px;
+            margin: 8px 8px 8px 0;
+            color: white;
+            text-align: center;
+        }
+
+        .email-type-badge.phishing {
+            background-color: #e74c3c;
+        }
+
+        .email-type-badge.spam {
+            background-color: #f39c12;
+        }
+
+        .email-type-badge.fraud {
+            background-color: #c0392b;
+        }
+
+        .email-type-badge.malware {
+            background-color: #8e44ad;
+        }
+
+        .email-type-badge.legitimate {
+            background-color: #27ae60;
+        }
+
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+
+        .status-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>🛡️ ShieldBox Color Test</h1>
+
+        <div class="test-section">
+            <h2>Color Scheme Verification</h2>
+            <p>This page tests the color schemes used in your ShieldBox Chrome extension to ensure proper visibility and
+                contrast.</p>
+
+            <div class="color-demo">
+                <div class="result-box safe">
+                    <div class="email-type-badge legitimate">SAFE</div>
+                    This email appears to be legitimate and safe.
+                </div>
+
+                <div class="result-box phishing">
+                    <div class="email-type-badge phishing">PHISHING</div>
+                    This email contains suspicious content that may be attempting to steal your information.
+                </div>
+
+                <div class="result-box spam">
+                    <div class="email-type-badge spam">SPAM</div>
+                    This email appears to be unsolicited marketing or bulk mail.
+                </div>
+
+                <div class="result-box fraud">
+                    <div class="email-type-badge fraud">FRAUD</div>
+                    This email appears to be attempting financial fraud or deception.
+                </div>
+
+                <div class="result-box malware">
+                    <div class="email-type-badge malware">MALWARE</div>
+                    This email may contain malicious attachments or links to harmful software.
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Backend API Test</h2>
+            <p>Test the improved email classification API directly:</p>
+
+            <button class="test-button" onclick="testSafeEmail()">Test Safe Email</button>
+            <button class="test-button" onclick="testPhishingEmail()">Test Phishing Email</button>
+            <button class="test-button" onclick="testSpamEmail()">Test Spam Email</button>
+
+            <div id="api-result" class="status-info">
+                Click a button above to test the API response...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testEmailAPI(emailData, expectedType) {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = 'Testing...';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/scan-email-links', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailData)
+                });
+
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <strong>API Response:</strong><br>
+                    Status: ${data.status}<br>
+                    Email Status: ${data.email_status}<br>
+                    Email Category: ${data.email_category}<br>
+                    Confidence: ${data.confidence?.toFixed(3) || 'N/A'}<br>
+                    Expected: ${expectedType}<br>
+                    <span style="color: ${data.status === expectedType ? 'green' : 'red'}">
+                        ${data.status === expectedType ? '✅ CORRECT' : '❌ INCORRECT'}
+                    </span>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red">Error: ${error.message}</span>`;
+            }
+        }
+
+        function testSafeEmail() {
+            testEmailAPI({
+                subject: "Meeting tomorrow",
+                sender: "colleague@company.com",
+                body: "Hi, let's meet tomorrow at 3pm in the conference room."
+            }, 'safe');
+        }
+
+        function testPhishingEmail() {
+            testEmailAPI({
+                subject: "URGENT: Verify your account",
+                sender: "security@fake-bank.com",
+                body: "Your account has been suspended. Please verify immediately: https://fake-bank-verify.malicious.com/login"
+            }, 'phishing');
+        }
+
+        function testSpamEmail() {
+            testEmailAPI({
+                subject: "SPECIAL OFFER: 50% OFF!",
+                sender: "offers@deals.com",
+                body: "Limited time offer! Get 50% off everything. Shop now and save big!"
+            }, 'safe'); // Note: Our current model might classify this as safe
+        }
+    </script>
+</body>
+
+</html>

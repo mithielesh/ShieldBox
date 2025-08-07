@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chrome Extension Response Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .safe { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .spam { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        .phishing { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Chrome Extension Response Processing Test</h1>
+    
+    <div class="test-case">
+        <h3>Test Case: Father's Project Email</h3>
+        <p><strong>Subject:</strong> Future project ideas</p>
+        <p><strong>Sender:</strong> dad@family.com</p>
+        <p><strong>Content:</strong> Project ideas with YouTube link</p>
+        
+        <h4>Backend Response (Real Data):</h4>
+        <pre id="backend-response"></pre>
+        
+        <h4>Chrome Extension Processing Result:</h4>
+        <div id="extension-result" class="result"></div>
+        
+        <button onclick="testEmailClassification()">Test Classification</button>
+    </div>
+
+    <script>
+        // Simulate the exact backend response from our test
+        const backendData = {
+            "confidence": 0.5569948186528497,
+            "email_category": "spam",      // Raw ML prediction
+            "email_status": "safe",        // After confidence threshold  
+            "has_phishing": false,
+            "link_count": 1,
+            "links": [{"status": "safe", "url": "https://www.youtube.com"}],
+            "model_used": "ML model",
+            "phishing_link_count": 0,
+            "severity": "low",
+            "status": "safe",              // Final decision
+            "timestamp": "2025-08-04 22:15:21"
+        };
+
+        // Simulate the Chrome extension's processing logic (FIXED VERSION)
+        function processBackendResponse(data) {
+            let backendResult = 'safe';
+            let threatDetails = null;
+
+            // FIXED: Only use final processed statuses, not raw ML predictions
+            const status = data.status?.toLowerCase() || 'unknown';
+            const emailStatus = data.email_status?.toLowerCase() || status;
+
+            console.log("Status mapping:", { status, emailStatus });
+
+            if (status === 'no_links') {
+                backendResult = emailStatus || 'safe';
+                threatDetails = { description: "No links found in this email. Classification based on email content analysis." };
+            } else if (status === 'phishing' || emailStatus === 'phishing' || data.has_phishing) {
+                backendResult = 'phishing';
+                threatDetails = { description: "Phishing detected!" };
+            } else if (status === 'spam' || emailStatus === 'spam') {
+                // Only use processed statuses, not raw category
+                backendResult = 'spam';
+                threatDetails = { description: "This email appears to be spam or promotional content." };
+            } else {
+                backendResult = 'safe';
+                threatDetails = { 
+                    description: data.link_count > 0 ? 
+                        `Scanned ${data.link_count} link(s) in this email - all appear legitimate.` :
+                        "Email content appears legitimate and safe."
+                };
+            }
+
+            return { result: backendResult, details: threatDetails };
+        }
+
+        function testEmailClassification() {
+            // Display backend response
+            document.getElementById('backend-response').textContent = JSON.stringify(backendData, null, 2);
+            
+            // Process with extension logic
+            const processed = processBackendResponse(backendData);
+            
+            // Display result
+            const resultDiv = document.getElementById('extension-result');
+            resultDiv.className = `result ${processed.result}`;
+            resultDiv.innerHTML = `
+                <strong>Final Classification:</strong> ${processed.result.toUpperCase()}<br>
+                <strong>Description:</strong> ${processed.details.description}<br>
+                <strong>Raw ML Category:</strong> ${backendData.email_category} (ignored ✅)<br>
+                <strong>Processed Status:</strong> ${backendData.status} (used ✅)
+            `;
+            
+            // Show the fix worked
+            if (processed.result === 'safe' && backendData.email_category === 'spam') {
+                resultDiv.innerHTML += '<br><br>🎉 <strong>FIX SUCCESSFUL!</strong> Raw ML prediction was "spam" but confidence threshold correctly marked it as "safe"';
+            }
+        }
+
+        // Auto-run the test
+        testEmailClassification();
+    </script>
+</body>
+</html>

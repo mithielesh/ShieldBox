@@ -1,0 +1,938 @@
+:host {
+  /* Color scheme variables for consistent theming */
+  --color-safe: #27ae60;
+  --color-safe-light: #2ecc71;
+  --color-phishing: #e74c3c;
+  --color-phishing-dark: #c0392b;
+  --color-fraud: #c0392b;
+  --color-fraud-dark: #a93226;
+  --color-spam: #f39c12;
+  --color-spam-dark: #e67e22;
+  --color-malware: #8e44ad;
+  --color-malware-light: #9b59b6;
+  --color-unknown: #7f8c8d;
+  --color-unknown-light: #95a5a6;
+  --color-scanning: #3498db;
+
+  /* Background and UI variables */
+  --background-dark: rgba(30, 30, 30, 0.85);
+  --background-light: rgba(255, 255, 255, 0.85);
+  --card-dark: rgba(40, 40, 40, 0.7);
+  --card-light: rgba(255, 255, 255, 0.7);
+  --text-dark: #f5f5f5;
+  --text-light: #111;
+  --border-radius: 20px;
+  --transition-speed: 0.3s;
+
+  font-family: 'Inter', 'Segoe UI Variable', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-variation-settings: 'wght' 450, 'slnt' 0;
+  font-feature-settings: 'ss01' on, 'cv01' on, 'cv02' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
+}
+
+/* Professional glassy floating panel, transparent and consistent */
+/* Default: glassy transparent */
+/* Default: glassy transparent */
+.floating-container {
+  width: 320px;
+  padding: 16px 14px 14px 14px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.60);
+  backdrop-filter: blur(18px) saturate(200%);
+  -webkit-backdrop-filter: blur(18px) saturate(200%);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15), 0 1.5px 6px rgba(0, 0, 0, 0.10);
+  color: var(--text-light);
+  transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+  box-sizing: border-box;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+}
+
+/* Dark mode: black transparent */
+
+:host(.dark-mode) .floating-container {
+  background: rgba(24, 28, 40, 0.75);
+  color: var(--text-dark);
+}
+
+:host(.light-mode) .floating-container {
+  background: rgba(255, 255, 255, 0.60);
+  color: var(--text-light);
+}
+
+.panel-header {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  letter-spacing: 0.15px;
+  font-family: inherit;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+
+.card {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.22) 60%, rgba(230, 240, 255, 0.13) 100%);
+  padding: 12px 14px 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 13px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  transition: background 0.3s, color 0.3s, border 0.3s;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+:host(.light-mode) .card {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text-light);
+}
+
+/* Enhanced card backgrounds based on threat level */
+.card.safe {
+  background: linear-gradient(120deg, rgba(39, 174, 96, 0.15) 60%, rgba(46, 204, 113, 0.08) 100%);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+  box-shadow: 0 2px 12px rgba(39, 174, 96, 0.15);
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.safe {
+  background: linear-gradient(120deg, rgba(39, 174, 96, 0.20) 60%, rgba(46, 204, 113, 0.12) 100%);
+  border: 1px solid rgba(39, 174, 96, 0.4);
+  color: var(--text-dark) !important;
+}
+
+.card.phishing {
+  background: linear-gradient(120deg, rgba(231, 76, 60, 0.15) 60%, rgba(192, 57, 43, 0.08) 100%);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  box-shadow: 0 2px 12px rgba(231, 76, 60, 0.15);
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.phishing {
+  background: linear-gradient(120deg, rgba(231, 76, 60, 0.20) 60%, rgba(192, 57, 43, 0.12) 100%);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: var(--text-dark) !important;
+}
+
+.card.fraud {
+  background: linear-gradient(120deg, rgba(192, 57, 43, 0.15) 60%, rgba(169, 50, 38, 0.08) 100%);
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  box-shadow: 0 2px 12px rgba(192, 57, 43, 0.15);
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.fraud {
+  background: linear-gradient(120deg, rgba(192, 57, 43, 0.20) 60%, rgba(169, 50, 38, 0.12) 100%);
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  color: var(--text-dark) !important;
+}
+
+.card.spam {
+  background: linear-gradient(120deg, rgba(243, 156, 18, 0.15) 60%, rgba(230, 126, 34, 0.08) 100%);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  box-shadow: 0 2px 12px rgba(243, 156, 18, 0.15);
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.spam {
+  background: linear-gradient(120deg, rgba(243, 156, 18, 0.20) 60%, rgba(230, 126, 34, 0.12) 100%);
+  border: 1px solid rgba(243, 156, 18, 0.4);
+  color: var(--text-dark) !important;
+}
+
+.card.malware {
+  background: linear-gradient(120deg, rgba(142, 68, 173, 0.15) 60%, rgba(155, 89, 182, 0.08) 100%);
+  border: 1px solid rgba(142, 68, 173, 0.3);
+  box-shadow: 0 2px 12px rgba(142, 68, 173, 0.15);
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.malware {
+  background: linear-gradient(120deg, rgba(142, 68, 173, 0.20) 60%, rgba(155, 89, 182, 0.12) 100%);
+  border: 1px solid rgba(142, 68, 173, 0.4);
+  color: var(--text-dark) !important;
+}
+
+.card.scanning {
+  background: linear-gradient(120deg, rgba(52, 152, 219, 0.15) 60%, rgba(41, 128, 185, 0.08) 100%);
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  box-shadow: 0 2px 12px rgba(52, 152, 219, 0.15);
+  animation: card-scanning-pulse 2s infinite;
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.scanning {
+  background: linear-gradient(120deg, rgba(52, 152, 219, 0.20) 60%, rgba(41, 128, 185, 0.12) 100%);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  color: var(--text-dark) !important;
+}
+
+.card.inactive {
+  background: linear-gradient(120deg, rgba(149, 165, 166, 0.10) 60%, rgba(127, 140, 141, 0.05) 100%);
+  border: 1px solid rgba(149, 165, 166, 0.2);
+  box-shadow: 0 2px 8px rgba(149, 165, 166, 0.1);
+  color: var(--text-light) !important;
+}
+
+:host(.dark-mode) .card.inactive {
+  background: linear-gradient(120deg, rgba(149, 165, 166, 0.15) 60%, rgba(127, 140, 141, 0.08) 100%);
+  border: 1px solid rgba(149, 165, 166, 0.3);
+  color: var(--text-dark) !important;
+}
+
+@keyframes card-scanning-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 2px 12px rgba(52, 152, 219, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 2px 18px rgba(52, 152, 219, 0.25);
+  }
+}
+
+.email-scan-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Enhanced status color scheme for better visual feedback */
+.scan-status {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Add status icons for better visual recognition */
+.scan-status::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+/* SAFE - Green variants */
+.scan-status.safe {
+  color: var(--color-safe);
+}
+
+.scan-status.safe::before {
+  background-color: var(--color-safe);
+  content: '✓';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+  box-shadow: none;
+}
+
+/* PHISHING - Red variants */
+.scan-status.phishing {
+  color: var(--color-phishing);
+}
+
+.scan-status.phishing::before {
+  background-color: var(--color-phishing);
+  content: '⚠';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 8px;
+  box-shadow: none;
+}
+
+/* FRAUD - Dark red variants */
+.scan-status.fraud {
+  color: var(--color-fraud);
+}
+
+.scan-status.fraud::before {
+  background-color: var(--color-fraud);
+  content: '🚫';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 6px;
+  box-shadow: none;
+}
+
+/* SPAM - Orange variants */
+.scan-status.spam {
+  color: var(--color-spam);
+}
+
+.scan-status.spam::before {
+  background-color: var(--color-spam);
+  content: '📧';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 6px;
+  box-shadow: none;
+}
+
+/* MALWARE - Purple variants */
+.scan-status.malware {
+  color: var(--color-malware);
+}
+
+.scan-status.malware::before {
+  background-color: var(--color-malware);
+  content: '🦠';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 6px;
+  box-shadow: none;
+}
+
+/* SCANNING - Blue variants */
+.scan-status.scanning {
+  color: var(--color-scanning);
+}
+
+.scan-status.scanning::before {
+  background-color: var(--color-scanning);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* UNKNOWN/ERROR - Gray variants */
+.scan-status.unknown,
+.scan-status.error {
+  color: var(--color-unknown);
+}
+
+.scan-status.unknown::before,
+.scan-status.error::before {
+  background-color: var(--color-unknown);
+  content: '?';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+  box-shadow: none;
+}
+
+/* Pulse animation for scanning status */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.feature-list {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-left: 20px;
+}
+
+.feature-list li {
+  margin-bottom: 3px;
+}
+
+/* Enhanced email type badges with consistent color scheme */
+.email-type-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 12px;
+  margin: 8px 0;
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add subtle gradient overlay for better visual appeal */
+.email-type-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* SAFE - Bright Green */
+.email-type-badge.safe,
+.email-type-badge.legitimate {
+  background: linear-gradient(135deg, var(--color-safe), var(--color-safe-light));
+  box-shadow: 0 3px 12px rgba(39, 174, 96, 0.4);
+}
+
+/* PHISHING - Bright Red */
+.email-type-badge.phishing {
+  background: linear-gradient(135deg, var(--color-phishing), var(--color-phishing-dark));
+  box-shadow: 0 3px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* FRAUD - Dark Red */
+.email-type-badge.fraud {
+  background: linear-gradient(135deg, var(--color-fraud), var(--color-fraud-dark));
+  box-shadow: 0 3px 12px rgba(192, 57, 43, 0.4);
+}
+
+/* SPAM - Orange */
+.email-type-badge.spam {
+  background: linear-gradient(135deg, var(--color-spam), var(--color-spam-dark));
+  box-shadow: 0 3px 12px rgba(243, 156, 18, 0.4);
+}
+
+/* MALWARE - Purple */
+.email-type-badge.malware {
+  background: linear-gradient(135deg, var(--color-malware), var(--color-malware-light));
+  box-shadow: 0 3px 12px rgba(142, 68, 173, 0.4);
+}
+
+/* UNKNOWN - Gray */
+.email-type-badge.unknown {
+  background: linear-gradient(135deg, var(--color-unknown), var(--color-unknown-light));
+  box-shadow: 0 3px 12px rgba(127, 140, 141, 0.4);
+}
+
+/* Hover effects for interactive badges */
+.email-type-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.label-title {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+  font-size: 15px;
+  letter-spacing: 0.1px;
+  font-family: inherit;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1.2px solid rgba(30, 60, 180, 0.10);
+  outline: none;
+  background: rgba(255, 255, 255, 0.13);
+  margin-bottom: 8px;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  box-sizing: border-box;
+  display: block;
+  font-family: inherit;
+}
+
+input[type="text"]:focus {
+  border: 1.2px solid #1976d2;
+  background: rgba(230, 240, 255, 0.18);
+}
+
+button {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #1976d2 0%, #00c6ff 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  font-family: inherit;
+  box-shadow: none;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #0050c4 0%, #00c6ff 100%);
+  transform: scale(1.01);
+}
+
+button:active {
+  background: linear-gradient(90deg, #1976d2 0%, #00c6ff 100%);
+  transform: scale(0.98);
+}
+
+.result-box {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 14px;
+  border: 1.5px solid rgba(30, 60, 180, 0.12);
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  transition: all 0.3s ease;
+  color: inherit;
+}
+
+.result-box.safe {
+  background: linear-gradient(45deg, rgba(76, 175, 80, 0.25) 0%, rgba(139, 195, 74, 0.15) 100%);
+  border-color: rgba(76, 175, 80, 0.6);
+  color: #0d4015;
+  font-weight: 600;
+}
+
+:host(.dark-mode) .result-box.safe {
+  color: #81c784;
+}
+
+.result-box.phishing {
+  background: linear-gradient(45deg, rgba(244, 67, 54, 0.25) 0%, rgba(229, 57, 53, 0.15) 100%);
+  border-color: rgba(244, 67, 54, 0.6);
+  color: #b71c1c;
+  font-weight: 600;
+}
+
+:host(.dark-mode) .result-box.phishing {
+  color: #ffcdd2;
+}
+
+/* Result box with spam status */
+.result-box.spam {
+  background: linear-gradient(45deg, rgba(255, 152, 0, 0.25) 0%, rgba(255, 193, 7, 0.15) 100%);
+  border-color: rgba(255, 152, 0, 0.6);
+  color: #e65100;
+  font-weight: 600;
+}
+
+:host(.dark-mode) .result-box.spam {
+  color: #ffcc02;
+}
+
+/* Result box with fraud status */
+.result-box.fraud {
+  background: linear-gradient(45deg, rgba(244, 67, 54, 0.25) 0%, rgba(229, 57, 53, 0.15) 100%);
+  border-color: rgba(244, 67, 54, 0.6);
+  color: #b71c1c;
+  font-weight: 600;
+}
+
+:host(.dark-mode) .result-box.fraud {
+  color: #ffcdd2;
+}
+
+/* Result box with malware status */
+.result-box.malware {
+  background: linear-gradient(45deg, rgba(156, 39, 176, 0.25) 0%, rgba(103, 58, 183, 0.15) 100%);
+  border-color: rgba(156, 39, 176, 0.6);
+  color: #4a148c;
+  font-weight: 600;
+}
+
+:host(.dark-mode) .result-box.malware {
+  color: #e1bee7;
+}
+
+.phishing-links {
+  margin-top: 8px;
+  border-top: 1px solid rgba(183, 28, 28, 0.2);
+  padding-top: 6px;
+}
+
+.phishing-links ul {
+  margin: 4px 0 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  max-height: 70px;
+  overflow-y: auto;
+}
+
+.phishing-links li {
+  margin-bottom: 3px;
+  word-break: break-all;
+}
+
+/* Compact toggle row */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 0 0 0;
+  padding: 0;
+  gap: 10px;
+}
+
+/* Toggle Switch Styling */
+
+/* ============================================================================
+   ENHANCED VISUAL FEEDBACK SYSTEM
+   ============================================================================ */
+
+/* Confidence indicator bars */
+.confidence-indicator {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.confidence-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.confidence-bar.safe {
+  background: linear-gradient(90deg, var(--color-safe), var(--color-safe-light));
+}
+
+.confidence-bar.phishing {
+  background: linear-gradient(90deg, var(--color-phishing), var(--color-phishing-dark));
+}
+
+.confidence-bar.fraud {
+  background: linear-gradient(90deg, var(--color-fraud), var(--color-fraud-dark));
+}
+
+.confidence-bar.spam {
+  background: linear-gradient(90deg, var(--color-spam), var(--color-spam-dark));
+}
+
+.confidence-bar.malware {
+  background: linear-gradient(90deg, var(--color-malware), var(--color-malware-light));
+}
+
+/* Status text with enhanced visibility */
+.status-text {
+  font-weight: 700;
+  font-size: 16px;
+  margin: 8px 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.status-text.safe {
+  color: var(--color-safe);
+}
+
+.status-text.phishing {
+  color: var(--color-phishing);
+}
+
+.status-text.fraud {
+  color: var(--color-fraud);
+}
+
+.status-text.spam {
+  color: var(--color-spam);
+}
+
+.status-text.malware {
+  color: var(--color-malware);
+}
+
+/* Threat level indicators */
+.threat-level {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 8px;
+}
+
+.threat-level.low {
+  background-color: var(--color-safe);
+  color: white;
+}
+
+.threat-level.medium {
+  background-color: var(--color-spam);
+  color: white;
+}
+
+.threat-level.high {
+  background-color: var(--color-phishing);
+  color: white;
+}
+
+.threat-level.critical {
+  background-color: var(--color-fraud);
+  color: white;
+  animation: pulse-critical 2s ease-in-out infinite;
+}
+
+/* Critical threat pulsing animation */
+@keyframes pulse-critical {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Status container with enhanced background */
+.status-container {
+  padding: 12px;
+  border-radius: 12px;
+  margin: 8px 0;
+  border-left: 4px solid;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.status-container.safe {
+  border-left-color: var(--color-safe);
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.status-container.phishing {
+  border-left-color: var(--color-phishing);
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.status-container.fraud {
+  border-left-color: var(--color-fraud);
+  background: rgba(192, 57, 43, 0.1);
+}
+
+.status-container.spam {
+  border-left-color: var(--color-spam);
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.status-container.malware {
+  border-left-color: var(--color-malware);
+  background: rgba(142, 68, 173, 0.1);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  margin-left: 8px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #e3eafc 0%, #b6ccfa 100%);
+  transition: 0.3s;
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(30, 60, 180, 0.07);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: linear-gradient(135deg, #fff 60%, #e3eafc 100%);
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(30, 60, 180, 0.10);
+}
+
+input:checked+.slider {
+  background: linear-gradient(90deg, #43a047 0%, #b2ff59 100%);
+}
+
+input:checked+.slider:before {
+  transform: translateX(20px);
+}
+
+.dark-toggle-container {
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: inherit;
+}
+
+/* Auto Scan Settings Styles */
+.settings-section {
+  padding: 8px 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  margin: 8px 0;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 4px 8px;
+}
+
+select {
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.dark-mode select {
+  background-color: rgba(60, 60, 60, 0.7);
+  color: white;
+  border-color: #555;
+}
+
+/* Result box with monitoring status */
+.result-box.monitoring {
+  background-color: rgba(0, 128, 255, 0.2);
+  border-color: rgba(0, 128, 255, 0.5);
+  color: #0066cc;
+}
+
+/* Result box with scanning status */
+.result-box.scanning {
+  background: linear-gradient(45deg, rgba(150, 150, 255, 0.4) 0%, rgba(80, 80, 255, 0.2) 100%);
+  border-color: rgba(0, 123, 255, 0.4);
+  color: #0056b3;
+  animation: scanning-pulse 2s infinite;
+}
+
+:host(.dark-mode) .result-box.scanning {
+  color: #90caf9;
+}
+
+@keyframes scanning-pulse {
+  0% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* Result box with inactive status */
+.result-box.inactive {
+  background: rgba(245, 245, 245, 0.3);
+  border-color: rgba(158, 158, 158, 0.3);
+  color: #757575;
+  font-style: italic;
+}
+
+:host(.dark-mode) .result-box.inactive {
+  color: #bdbdbd;
+}
+
+/* Result box with no-email status */
+.result-box.no-email {
+  background: linear-gradient(45deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+  border-color: rgba(255, 193, 7, 0.6);
+  color: #6d5b10;
+  animation: no-email-pulse 2s infinite;
+  font-weight: 600;
+}
+
+:host(.dark-mode) .result-box.no-email {
+  color: #ffcc02;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0.5;
+    transform: translateY(-2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes no-email-pulse {
+  0% {
+    border-color: rgba(255, 193, 7, 0.4);
+    background: linear-gradient(45deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+  }
+
+  50% {
+    border-color: rgba(255, 193, 7, 0.8);
+    background: linear-gradient(45deg, rgba(255, 193, 7, 0.3) 0%, rgba(255, 152, 0, 0.2) 100%);
+  }
+
+  100% {
+    border-color: rgba(255, 193, 7, 0.4);
+    background: linear-gradient(45deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+  }
+}
+
+/* Result box with error status */
+.result-box.error {
+  background: linear-gradient(45deg, rgba(255, 235, 238, 0.4) 0%, rgba(255, 205, 210, 0.2) 100%);
+  border-color: rgba(239, 83, 80, 0.4);
+  color: #c62828;
+}
+
+/* Card header styling */
+.card-header {
+  padding: 10px 15px;
+  background: linear-gradient(90deg, #1976d2 0%, #00c6ff 100%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 6px 6px 0 0;
+  margin: 0 -14px;
+  margin-top: -12px;
+  margin-bottom: 10px;
+}

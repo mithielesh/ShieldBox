@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shield Box</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container glassy">
+    <h2>Shield Box</h2>
+
+    <!-- Manual Scan Section -->
+    <div class="card">
+      <div class="card-header">Manual Link Scan</div>
+      <input type="text" id="urlInput" placeholder="Paste URL here..." />
+      <button id="scanBtn">Scan</button>
+      <div id="manualResultBox" class="result-box">No scan yet.</div>
+    </div>
+
+    <!-- Toggles Section -->
+    <div class="card">
+      <div class="card-header">⚙️ Controls</div>
+
+      <div class="toggle-row">
+        <span>Auto Scan</span>
+        <label class="switch">
+          <input type="checkbox" id="autoScanToggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- New Auto Scan Settings -->
+      <div id="autoScanSettings" class="settings-section">
+        <div class="setting-row">
+          <span>Scan Interval:</span>
+          <select id="scanIntervalSelect">
+            <option value="10000">10 seconds</option>
+            <option value="30000" selected>30 seconds</option>
+            <option value="60000">1 minute</option>
+            <option value="300000">5 minutes</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <span>Show Notifications</span>
+          <label class="switch">
+            <input type="checkbox" id="notifyToggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span>Highlight Phishing Links</span>
+          <label class="switch">
+            <input type="checkbox" id="highlightToggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <span>IoT Alerts</span>
+        <label class="switch">
+          <input type="checkbox" id="iotToggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Email Scan Section -->
+    <div class="card">
+      <div class="card-header">Email Analysis</div>
+      <div class="email-scan-controls">
+        <button id="scanEmailBtn">Scan Current Email</button>
+      </div>
+      <div id="emailResultBox" class="result-box">No email scanned yet.</div>
+    </div>
+
+    <!-- Auto Scan Result -->
+    <div class="card">
+      <div class="card-header">Auto Scan Status</div>
+      <div id="autoResultBox" class="result-box">Auto scan idle.</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

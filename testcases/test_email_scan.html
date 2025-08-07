@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Email Scan Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .email {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .subject {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .sender {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .body {
+            line-height: 1.5;
+        }
+
+        .test-btn {
+            padding: 10px 15px;
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        h2 {
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Email Scan Test Cases</h1>
+    <p>Use these sample emails to test the ShieldBox email scanning functionality.</p>
+
+    <h2>Test Email 1: Phishing Email</h2>
+    <div class="email">
+        <div class="subject">URGENT: Your account has been locked</div>
+        <div class="sender">security@bank-verify-account.com</div>
+        <div class="body">
+            Dear Customer,<br><br>
+
+            We have detected unusual activity in your account. Your account has been temporarily locked for security
+            reasons.<br><br>
+
+            Please click on the following link to verify your identity and restore access to your account
+            immediately:<br>
+            <a href="https://bank-secure-verify.com/login.php">https://bank-secure-verify.com/login.php</a><br><br>
+
+            You will need to confirm your password, social security number, and banking details.<br><br>
+
+            This is urgent - if you do not verify within 24 hours, your account will be permanently suspended.<br><br>
+
+            Security Department<br>
+            Customer Service
+        </div>
+        <button class="test-btn" data-type="phishing">Test Phishing Email</button>
+    </div>
+
+    <h2>Test Email 2: Fraud Email</h2>
+    <div class="email">
+        <div class="subject">CONFIDENTIAL: Business Transaction ($5.5M)</div>
+        <div class="sender">mr.johnson.wire@business-finance.net</div>
+        <div class="body">
+            Dear Friend,<br><br>
+
+            I am Mr. Johnson Williams, director of operations at WEST AFRICAN BANK. I have a business transaction worth
+            $5.5 million dollars that will be very profitable for both of us.<br><br>
+
+            A deceased client left behind this money, and I need your help to transfer it out of the country. I am
+            prepared to offer you 30% of the total amount for your assistance.<br><br>
+
+            To proceed, I need you to send me your bank account details, including:<br>
+            1. Full name<br>
+            2. Bank account number<br>
+            3. Bank routing number<br>
+            4. Address and phone number<br><br>
+
+            I need your urgent response as this transaction must be completed within 5 business days.<br><br>
+
+            Best regards,<br>
+            Mr. Johnson Williams
+        </div>
+        <button class="test-btn" data-type="fraud">Test Fraud Email</button>
+    </div>
+
+    <h2>Test Email 3: Spam Email</h2>
+    <div class="email">
+        <div class="subject">INCREDIBLE OFFER! 90% OFF Designer Watches - Today Only!</div>
+        <div class="sender">amazingdeals@discount-luxury-watches.co</div>
+        <div class="body">
+            *** SPECIAL LIMITED TIME OFFER ***<br><br>
+
+            GET 90% OFF LUXURY DESIGNER WATCHES!<br>
+            Rolex, Omega, Tag Heuer, and more!<br><br>
+
+            👉 CLICK HERE: <a
+                href="https://discount-luxury-watches.co/sale">https://discount-luxury-watches.co/sale</a><br><br>
+
+            ✅ Guaranteed authentic<br>
+            ✅ Free worldwide shipping<br>
+            ✅ Limited time offer - TODAY ONLY!<br><br>
+
+            Don't miss out on this INCREDIBLE deal!<br>
+            Order now while supplies last!<br><br>
+
+            To unsubscribe from our mailing list, click <a href="#">here</a>.
+        </div>
+        <button class="test-btn" data-type="spam">Test Spam Email</button>
+    </div>
+
+    <h2>Test Email 4: Malware Email</h2>
+    <div class="email">
+        <div class="subject">Your invoice #INV-29845</div>
+        <div class="sender">invoices@billing-department.net</div>
+        <div class="body">
+            Dear Customer,<br><br>
+
+            Please find attached your invoice #INV-29845 for your recent purchase.<br><br>
+
+            To view the details of your transaction, please download and open the attached file: <br>
+            <a href="#">INVOICE-29845.zip</a> (Contains: INVOICE-29845.exe)<br><br>
+
+            If you have any questions about this invoice, please do not hesitate to contact our customer service
+            department.<br><br>
+
+            Thank you for your business.<br><br>
+
+            Billing Department
+        </div>
+        <button class="test-btn" data-type="malware">Test Malware Email</button>
+    </div>
+
+    <h2>Test Email 5: Legitimate Email</h2>
+    <div class="email">
+        <div class="subject">Your Amazon Order #114-2875223-9565815</div>
+        <div class="sender">auto-confirm@amazon.com</div>
+        <div class="body">
+            Hello John Doe,<br><br>
+
+            Thank you for your order from Amazon.com!<br><br>
+
+            Your Order #114-2875223-9565815 has been placed on July 31, 2025.<br><br>
+
+            Your package will be delivered on Wednesday, August 6.<br><br>
+
+            ORDER DETAILS:<br>
+            - 1x Book: "Programming in Python" - $29.99<br>
+            - 1x USB Cable - $7.99<br>
+            Shipping: FREE with Prime<br>
+            Tax: $3.80<br>
+            Total: $41.78<br><br>
+
+            You can track your order status here: <a
+                href="https://amazon.com/orders">https://amazon.com/orders</a><br><br>
+
+            Thank you for shopping with us!<br><br>
+
+            Amazon Customer Service
+        </div>
+        <button class="test-btn" data-type="legitimate">Test Legitimate Email</button>
+    </div>
+
+    <script>
+        // For testing purposes only
+        document.querySelectorAll('.test-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const emailType = this.getAttribute('data-type');
+                const emailDiv = this.parentNode;
+                const subject = emailDiv.querySelector('.subject').innerText;
+                const sender = emailDiv.querySelector('.sender').innerText;
+                const body = emailDiv.querySelector('.body').innerText;
+
+                alert(`Selected email of type: ${emailType}\nTo test in extension:\n1. Copy this email content\n2. Open Gmail or another email service\n3. Use ShieldBox to scan it`);
+
+                // Copy content to clipboard
+                const content = `Subject: ${subject}\nFrom: ${sender}\n\n${body}`;
+                navigator.clipboard.writeText(content).then(() => {
+                    console.log('Email content copied to clipboard');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

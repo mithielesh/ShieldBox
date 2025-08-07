@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ShieldBox Toggle Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .test-button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .test-button:hover {
+            background: #005a8b;
+        }
+
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+
+        .status-on {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .status-off {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>ShieldBox Auto-Scan Toggle Test</h1>
+
+    <p>Use these buttons to test the auto-scan toggle functionality:</p>
+
+    <button class="test-button" onclick="testToggleON()">🟢 Test Toggle ON</button>
+    <button class="test-button" onclick="testToggleOFF()">🔴 Test Toggle OFF</button>
+    <button class="test-button" onclick="checkStatus()">🔍 Check Status</button>
+    <button class="test-button" onclick="fullDiagnostic()">🔧 Full Diagnostic</button>
+
+    <div id="test-results" class="test-result">
+        Test results will appear here...
+    </div>
+
+    <h2>Instructions:</h2>
+    <ol>
+        <li>Open this page in Chrome with ShieldBox extension installed</li>
+        <li>Navigate to Gmail in another tab</li>
+        <li>Use the buttons above to test toggle functionality</li>
+        <li>Check the browser console (F12) for detailed logs</li>
+        <li>Verify that the floating panel shows/hides correctly</li>
+    </ol>
+
+    <script>
+        const resultsDiv = document.getElementById('test-results');
+
+        function logResult(message, isSuccess = true) {
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.innerHTML += `<div style="color: ${isSuccess ? 'green' : 'red'}">
+                [${timestamp}] ${message}
+            </div>`;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        function testToggleON() {
+            logResult('🟢 Testing AUTO-SCAN ON...');
+
+            // Send toggle ON message
+            chrome.runtime.sendMessage({
+                action: 'updateAutoScanSettings',
+                settings: { enabled: true }
+            }, (response) => {
+                logResult(`Toggle ON response: ${JSON.stringify(response)}`);
+            });
+
+            // Update storage
+            chrome.storage.local.set({ autoScan: true }, () => {
+                logResult('Storage updated: autoScan = true');
+            });
+
+            // Send show panel command
+            window.postMessage({
+                type: 'shield_box_control',
+                action: 'show_panel'
+            }, '*');
+
+            logResult('✅ Toggle ON commands sent');
+        }
+
+        function testToggleOFF() {
+            logResult('🔴 Testing AUTO-SCAN OFF...');
+
+            // Send toggle OFF message
+            chrome.runtime.sendMessage({
+                action: 'updateAutoScanSettings',
+                settings: { enabled: false }
+            }, (response) => {
+                logResult(`Toggle OFF response: ${JSON.stringify(response)}`);
+            });
+
+            // Update storage
+            chrome.storage.local.set({ autoScan: false }, () => {
+                logResult('Storage updated: autoScan = false');
+            });
+
+            // Send hide panel command
+            window.postMessage({
+                type: 'shield_box_control',
+                action: 'hide_panel'
+            }, '*');
+
+            logResult('✅ Toggle OFF commands sent');
+        }
+
+        function checkStatus() {
+            logResult('🔍 Checking current status...');
+
+            // Check storage
+            chrome.storage.local.get(['autoScan'], (data) => {
+                logResult(`Storage autoScan: ${data.autoScan}`);
+            });
+
+            // Check content script
+            chrome.runtime.sendMessage({
+                action: 'getAutoScanStatus'
+            }, (response) => {
+                logResult(`Content script status: ${JSON.stringify(response)}`);
+            });
+
+            // Check for floating panel
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                chrome.tabs.executeScript(tabs[0].id, {
+                    code: `
+                        const panel = document.getElementById('shieldbox-floating-panel');
+                        if (panel) {
+                            'Panel found - Display: ' + panel.style.display + ', Opacity: ' + panel.style.opacity + ', Visibility: ' + panel.style.visibility;
+                        } else {
+                            'Panel NOT found';
+                        }
+                    `
+                }, (results) => {
+                    if (results && results[0]) {
+                        logResult(`Panel status: ${results[0]}`);
+                    } else {
+                        logResult('Could not check panel status', false);
+                    }
+                });
+            });
+        }
+
+        function fullDiagnostic() {
+            logResult('🔧 Running full diagnostic...');
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            // Run all checks
+            setTimeout(() => checkStatus(), 100);
+            setTimeout(() => {
+                logResult('=== DIAGNOSTIC COMPLETE ===');
+                logResult('Check browser console (F12) for detailed logs');
+            }, 1000);
+        }
+
+        // Initialize
+        logResult('🚀 ShieldBox Toggle Test ready');
+        logResult('Click the buttons above to test functionality');
+    </script>
+</body>
+
+</html>
