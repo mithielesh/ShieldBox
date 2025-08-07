@@ -1,5 +1,18 @@
 function extractEmailDetails() {
-  console.log('[emailParser.js] Starting email extraction...');
+  // CRITICAL FIX 2: Find the main email container to scope our search.
+  // This prevents grabbing details from the inbox list or other UI elements.
+  // The .nH.hx selector is a reliable container for an open email thread in Gmail.
+  const emailContainer = document.querySelector('.nH.hx');
+  if (!emailContainer) {
+    console.log('[emailParser.js] No open email container found (.nH.hx). Aborting extraction.');
+    return {
+      subject: null, sender: null, body: null, hasAttachments: false, links: [], indicators: {}
+    };
+  }
+  console.log('[emailParser.js] Found open email container, searching within it.');
+
+
+  console.log('[emailParser.js] Starting email extraction within container...');
   console.log('[emailParser.js] Current URL:', window.location.href);
   console.log('[emailParser.js] Page title:', document.title);
 
@@ -21,7 +34,7 @@ function extractEmailDetails() {
 
   console.log('[emailParser.js] Testing subject selectors...');
   for (const selector of subjectSelectors) {
-    const element = document.querySelector(selector);
+    const element = emailContainer.querySelector(selector);
     console.log(`[emailParser.js] Selector "${selector}":`, element ? `Found: "${element.innerText?.trim()}"` : 'Not found');
     if (element && element.innerText) {
       subject = element.innerText.trim();
@@ -33,8 +46,8 @@ function extractEmailDetails() {
   // Enhanced Gmail sender selectors
   const senderSelectors = [
     '.gD',             // Classic Gmail sender name
+    '.gD[email]',      // More specific sender element with an email attribute
     '.go .gb .gD',     // Gmail sender with container
-    '.go .gb',         // Gmail sender area
     '[email]',         // Email attribute
     '.sender-name',    // Generic sender
     '[aria-label*="From"]'       // Accessibility-based
@@ -42,7 +55,7 @@ function extractEmailDetails() {
 
   console.log('[emailParser.js] Testing sender selectors...');
   for (const selector of senderSelectors) {
-    const element = document.querySelector(selector);
+    const element = emailContainer.querySelector(selector);
     console.log(`[emailParser.js] Selector "${selector}":`, element ? `Found: "${element.innerText?.trim() || element.getAttribute('email') || ''}"` : 'Not found');
     if (element) {
       sender = element.innerText?.trim() || element.getAttribute('email') || "";
@@ -68,7 +81,7 @@ function extractEmailDetails() {
 
   console.log('[emailParser.js] Testing body selectors...');
   for (const selector of bodySelectors) {
-    const element = document.querySelector(selector);
+    const element = emailContainer.querySelector(selector);
     const text = element?.innerText?.trim() || "";
     console.log(`[emailParser.js] Selector "${selector}":`, element ? `Found (length: ${text.length})` : 'Not found');
     if (element && element.innerText) {
@@ -90,7 +103,7 @@ function extractEmailDetails() {
     '[role="button"][aria-label*="Download"]' // Download buttons
   ];
 
-  hasAttachments = attachmentSelectors.some(selector => document.querySelector(selector) !== null);
+  hasAttachments = attachmentSelectors.some(selector => emailContainer.querySelector(selector) !== null);
 
   console.log('[emailParser.js] Initial extraction results:', {
     subject: subject ? `"${subject.substring(0, 50)}..."` : "EMPTY",
@@ -104,12 +117,12 @@ function extractEmailDetails() {
     console.log('[emailParser.js] Gmail extraction insufficient, trying other email providers...');
 
     // Outlook webmail selectors
-    const outlookSubject = document.querySelector('.allowTextSelection')?.getAttribute('aria-label') ||
-      document.querySelector('._2LiMA')?.innerText || "";
-    const outlookSender = document.querySelector('._1Bnf8')?.innerText ||
-      document.querySelector('._2LhbP')?.innerText || "";
-    const outlookBody = document.querySelector('.allowTextSelection')?.innerText || "";
-    const outlookAttachments = !!document.querySelector('.attachmentsInfo');
+    const outlookSubject = emailContainer.querySelector('.allowTextSelection')?.getAttribute('aria-label') ||
+      emailContainer.querySelector('._2LiMA')?.innerText || "";
+    const outlookSender = emailContainer.querySelector('._1Bnf8')?.innerText ||
+      emailContainer.querySelector('._2LhbP')?.innerText || "";
+    const outlookBody = emailContainer.querySelector('.allowTextSelection')?.innerText || "";
+    const outlookAttachments = !!emailContainer.querySelector('.attachmentsInfo');
 
     if (outlookBody && outlookBody.length > body.length) {
       subject = outlookSubject || subject;
@@ -124,7 +137,7 @@ function extractEmailDetails() {
       console.log('[emailParser.js] Trying generic email extraction...');
 
       // Try to find email body content using common structural patterns
-      const possibleBodyElements = document.querySelectorAll([
+      const possibleBodyElements = emailContainer.querySelectorAll([
         '[role="main"]',
         '.email-body',
         '.message-body',
@@ -160,7 +173,7 @@ function extractEmailDetails() {
         let largestTextElement = null;
         let largestTextLength = 0;
 
-        const allElements = document.querySelectorAll('div, article, section, main, [role="main"]');
+        const allElements = emailContainer.querySelectorAll('div, article, section, main, [role="main"]');
         for (const element of allElements) {
           const text = element.innerText || "";
           // Skip navigation and header elements
@@ -334,7 +347,7 @@ function autoScanEmail() {
 
   // Check if email has links to scan
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const links = body.match(urlRegex) || [];
+  const links = (body || '').match(urlRegex) || [];
 
   // Add link info to log
   if (links.length > 0) {
@@ -397,12 +410,13 @@ function autoScanEmail() {
   }
 }
 
-// Observe DOM changes to detect when user opens new email
-const observer = new MutationObserver(() => {
+// Observe DOM changes to detect when user opens new email.
+// Renamed to avoid conflict with content-script.js
+const emailParserObserver = new MutationObserver(() => {
   autoScanEmail();
 });
 
-observer.observe(document.body, { childList: true, subtree: true });
+emailParserObserver.observe(document.body, { childList: true, subtree: true });
 
 // Trigger once on initial load
 autoScanEmail();

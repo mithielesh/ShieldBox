@@ -110,6 +110,14 @@ function getThreatDetails(emailType) {
 // Listen for messages from popup or floating panel
 // Handle extension icon click to toggle the floating panel
 chrome.action.onClicked.addListener(async (tab) => {
+  // CRITICAL FIX: Check if the tab is a valid page to inject scripts into.
+  // This prevents the "Receiving end does not exist" error on chrome:// pages.
+  if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('https://chrome.google.com/webstore')) {
+    console.log('[ShieldBox] Cannot toggle panel on a restricted page.');
+    // Optionally, you could open a new tab or show a notification here.
+    return;
+  }
+
   floatingPanelVisible = !floatingPanelVisible;
 
   try {
@@ -118,7 +126,7 @@ chrome.action.onClicked.addListener(async (tab) => {
       visible: floatingPanelVisible
     });
   } catch (error) {
-    console.error("[ShieldBox] Error toggling floating panel:", error);
+    console.warn("[ShieldBox] Could not toggle floating panel. Content script might not be injected or ready on this page.", error.message);
   }
 });
 
@@ -179,8 +187,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // First check if an email is actually open
       chrome.tabs.sendMessage(tabs[0].id, { action: "check_email_open" }, (emailCheckResponse) => {
         if (chrome.runtime.lastError) {
-          console.error("[ShieldBox] Error checking email open state:", chrome.runtime.lastError);
-          sendResponse({ error: "Could not check email status" });
+          console.warn("[ShieldBox] Error checking email open state:", chrome.runtime.lastError.message);
+          try {
+            sendResponse({ error: "Could not check email status" });
+          } catch (e) {
+            console.log("[ShieldBox] Could not send email check error response, original sender likely gone.", e);
+          }
           return;
         }
 
@@ -189,13 +201,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (!emailCheckResponse || !emailCheckResponse.isOpen) {
           console.log("[ShieldBox] No email is open, returning error");
 
-          // Enhanced error response with UI elements
-          sendResponse({
-            error: "No email detected. Please open an email first.",
-            status: "no-email",
-            htmlContent: "<b>📧 No Email Detected</b><br>Please open an email first to scan.",
-            explanation: "ShieldBox couldn't find an open email in the current view"
-          });
+          try {
+            // Enhanced error response with UI elements
+            sendResponse({
+              error: "No email detected. Please open an email first.",
+              status: "no-email",
+              htmlContent: "<b>📧 No Email Detected</b><br>Please open an email first to scan.",
+              explanation: "ShieldBox couldn't find an open email in the current view"
+            });
+          } catch (e) {
+            console.log("[ShieldBox] Could not send 'no-email' response, original sender likely gone.", e);
+          }
 
           // Also send a direct message to update UI elements
           chrome.tabs.sendMessage(tabs[0].id, {
@@ -210,8 +226,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Now that we know an email is open, extract its content
         chrome.tabs.sendMessage(tabs[0].id, { action: "extract_email" }, (response) => {
           if (chrome.runtime.lastError) {
-            console.error("[ShieldBox] Error sending message to content script:", chrome.runtime.lastError);
-            sendResponse({ error: "Could not access email content. Make sure you're on an email page." });
+            console.warn("[ShieldBox] Error sending message to content script:", chrome.runtime.lastError.message);
+            try {
+              sendResponse({ error: "Could not access email content. Make sure you're on an email page." });
+            } catch (e) {
+              console.log("[ShieldBox] Could not send email extraction error response, original sender likely gone.", e);
+            }
             return;
           }
 
@@ -219,13 +239,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
           if (!response || response.error) {
             console.log("[ShieldBox] No email detected:", response?.error || "No response");
-            sendResponse({ error: response?.error || "No email detected. Please open an email first." });
+            try {
+              sendResponse({ error: response?.error || "No email detected. Please open an email first." });
+            } catch (e) {
+              console.log("[ShieldBox] Could not send 'no-email-detected' response, original sender likely gone.", e);
+            }
             return;
           }
 
           if (!response.body) {
             console.error("[ShieldBox] No email body found");
-            sendResponse({ error: "No email content found. Please open a valid email." });
+            try {
+              sendResponse({ error: "No email content found. Please open a valid email." });
+            } catch (e) {
+              console.log("[ShieldBox] Could not send 'no-body' response, original sender likely gone.", e);
+            }
             return;
           }
 
@@ -317,12 +345,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 const threatDetails = getThreatDetails(emailType);
                 console.log(`[ShieldBox] Fallback local classification: ${emailType}`);
 
-                sendResponse({
-                  result: emailType,
-                  emailType: emailType,
-                  details: threatDetails,
-                  source: 'local_fallback'
-                });
+                try {
+                  sendResponse({
+                    result: emailType,
+                    emailType: emailType,
+                    details: threatDetails,
+                    source: 'local_fallback'
+                  });
+                } catch (e) {
+                  console.log("[ShieldBox] Could not send response for manual scan fallback, original sender likely gone.", e);
+                }
               });
           } catch (error) {
             console.error("[ShieldBox] Email scan error:", error);
@@ -820,12 +852,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         if (!emailData || !emailData.body) {
           console.log("[ShieldBox] No email data found or not on email page");
-          chrome.runtime.sendMessage({
-            action: "displayResult",
-            source: "email",
-            result: "No email data found. Make sure you're on an email page."
-          });
-          sendResponse({ error: "No email data" });
+          try {
+            chrome.runtime.sendMessage({
+              action: "displayResult",
+              source: "email",
+              result: "No email data found. Make sure you're on an email page."
+            });
+            sendResponse({ error: "No email data" });
+          } catch (e) {
+            console.log("[ShieldBox] Could not send 'no-email-data' response, original sender likely gone.", e);
+          }
           return;
         }
 
@@ -835,12 +871,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         if (links.length === 0) {
           console.log("[ShieldBox] No links found in email");
-          chrome.runtime.sendMessage({
-            action: "displayResult",
-            source: "email",
-            result: "No links found in email."
-          });
-          sendResponse({ result: "No links found" });
+          try {
+            chrome.runtime.sendMessage({
+              action: "displayResult",
+              source: "email",
+              result: "No links found in email."
+            });
+            sendResponse({ result: "No links found" });
+          } catch (e) {
+            console.log("[ShieldBox] Could not send 'no-links' response, original sender likely gone.", e);
+          }
           return;
         }
 
@@ -892,21 +932,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               resultMessage = `Email appears safe. ${data.link_count || 0} links checked.`;
             }
 
-            chrome.runtime.sendMessage({
-              action: "displayResult",
-              source: "email",
-              result: resultMessage,
-              status: data.status,
-              data: data // Pass full data for detailed view
-            });
+            try {
+              chrome.runtime.sendMessage({
+                action: "displayResult",
+                source: "email",
+                result: resultMessage,
+                status: data.status,
+                data: data // Pass full data for detailed view
+              });
 
-            sendResponse({
-              result: data.status,
-              links: data.links || [],
-              email_status: data.email_status,
-              link_count: data.link_count || 0,
-              phishing_link_count: data.phishing_link_count || 0
-            });
+              sendResponse({
+                result: data.status,
+                links: data.links || [],
+                email_status: data.email_status,
+                link_count: data.link_count || 0,
+                phishing_link_count: data.phishing_link_count || 0
+              });
+            } catch (e) {
+              console.log("[ShieldBox] Could not send email scan success response, original sender likely gone.", e);
+            }
           })
           .catch((err) => {
             console.error("[ShieldBox] Error during email scan:", err);
@@ -939,14 +983,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               ? `Potential phishing detected! (local scan - backend unavailable)`
               : `No suspicious patterns found. (local scan - backend unavailable)`;
 
-            chrome.runtime.sendMessage({
-              action: "displayResult",
-              source: "email",
-              result: resultMessage,
-              status: status
-            });
+            try {
+              chrome.runtime.sendMessage({
+                action: "displayResult",
+                source: "email",
+                result: resultMessage,
+                status: status
+              });
 
-            sendResponse({ result: status, links: links });
+              sendResponse({ result: status, links: links });
+            } catch (e) {
+              console.log("[ShieldBox] Could not send email scan fallback response, original sender likely gone.", e);
+            }
           });
       });
     });
@@ -972,14 +1020,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const emailData = message.data;
       if (!emailData || !emailData.body) {
         console.log("[ShieldBox] AutoScan: Invalid email data received.");
-        // Optionally send a message to UI to show an inactive state
-        chrome.runtime.sendMessage({
-          action: "displayAutoScanResult",
-          status: "inactive",
-          message: "No email content to scan.",
-          data: { status: "inactive", message: "No email content to scan." }
-        });
-        sendResponse({ error: "Invalid email data" });
+        try {
+          // Optionally send a message to UI to show an inactive state
+          chrome.runtime.sendMessage({
+            action: "displayAutoScanResult",
+            status: "inactive",
+            message: "No email content to scan.",
+            data: { status: "inactive", message: "No email content to scan." }
+          });
+          sendResponse({ error: "Invalid email data" });
+        } catch (e) {
+          console.log("[ShieldBox] Could not send 'invalid-data' response, original sender likely gone.", e);
+        }
         return;
       }
 
@@ -997,7 +1049,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
+          //"Access-Control-Allow-Origin": "*"
         },
         body: JSON.stringify({
           body: emailData.body,

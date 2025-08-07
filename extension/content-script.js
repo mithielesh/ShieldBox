@@ -610,9 +610,29 @@ let emailScanInterval = null;
 
 // Function to collect all URLs from the current page
 function collectPageUrls() {
-  const links = Array.from(document.getElementsByTagName('a'));
+  // 1. Define the content area to scan. This avoids scanning UI elements.
+  // For Gmail, the main content is within [role="main"]. For other sites, 'main' or 'body' are good fallbacks.
+  const contentArea = document.querySelector('[role="main"]') || document.querySelector('main') || document.body;
+
+  const links = Array.from(contentArea.getElementsByTagName('a'));
+  const currentHostname = window.location.hostname;
+
   const urls = links.map(link => link.href)
-    .filter(url => url && url.startsWith('http') && !scannedUrls.has(url))
+    .filter(url => {
+      if (!url || !url.startsWith('http') || scannedUrls.has(url)) {
+        return false;
+      }
+      // 2. Ignore links that point to the same website (e.g., internal navigation)
+      try {
+        const linkHostname = new URL(url).hostname;
+        if (linkHostname === currentHostname) {
+          return false;
+        }
+      } catch (e) {
+        return false; // Invalid URL, skip it
+      }
+      return true;
+    })
     .slice(0, 50); // Limit to 50 new URLs at a time to avoid overwhelming the backend
 
   urls.forEach(url => scannedUrls.add(url)); // Mark as processed
@@ -780,12 +800,13 @@ function highlightDangerousLinks(dangerousUrls) {
   const links = Array.from(document.getElementsByTagName('a'));
 
   links.forEach(link => {
-    if (dangerousUrls.includes(link.href)) {
+    // Check if the link is dangerous AND hasn't been highlighted already
+    if (dangerousUrls.includes(link.href) && !link.dataset.shieldboxWarning) {
       // Apply visual warning
       link.style.border = '2px solid red';
       link.style.padding = '2px';
       link.style.position = 'relative';
-      link.dataset.shieldboxWarning = 'true';
+      link.dataset.shieldboxWarning = 'true'; // Mark as highlighted
 
       // Add warning icon
       const warningIcon = document.createElement('span');
@@ -805,7 +826,7 @@ function highlightDangerousLinks(dangerousUrls) {
           e.preventDefault();
           return false;
         }
-      });
+      }, { once: true }); // Add the listener only once to prevent multiple popups
     }
   });
 }
@@ -951,13 +972,6 @@ function detectEmailContent() {
         return true;
       }
 
-      // Check if we're in inbox view
-      const inboxContainer = document.querySelector('.AO'); // Gmail inbox container
-      const threadList = document.querySelector('.Cp'); // Thread list element
-      if (inboxContainer && threadList) {
-        console.log('[ShieldBox] Gmail inbox view detected - NOT an open email');
-        viewType = "inbox";
-      }
     }
 
     // OUTLOOK DETECTION
@@ -1475,6 +1489,32 @@ function scanCurrentEmail(isManualTrigger = false) {
       // If we got a response, also send the result directly to ensure UI updates
       if (response.status === 'done' && response.emailType) {
         console.log('[ShieldBox] 🔄 Sending auto-scan result directly to UI as backup');
+
+        // --- NEW LOGIC TO PREVENT RE-SCANNING AND HANDLE LINK-SPECIFIC RESULTS ---
+        if (response.links && Array.isArray(response.links)) {
+          const dangerousLinksInEmail = [];
+
+          response.links.forEach(linkObj => {
+            if (linkObj && linkObj.url) {
+              // 1. Add all links from the email to the scanned set to prevent the
+              //    general auto-scanner from re-analyzing them.
+              scannedUrls.add(linkObj.url);
+
+              // 2. Collect any links that the backend specifically flagged as phishing.
+              if (linkObj.status === 'phishing') {
+                dangerousLinksInEmail.push(linkObj.url);
+              }
+            }
+          });
+
+          console.log(`[ShieldBox] 🛡️ Registered ${response.links.length} links from this email to prevent duplicate scans.`);
+
+          // 3. Even if the email is "safe" overall, highlight any individually flagged links.
+          if (dangerousLinksInEmail.length > 0) {
+            console.warn(`[ShieldBox] 📧 Email classified as '${response.emailType}', but contains ${dangerousLinksInEmail.length} phishing link(s). Highlighting them.`);
+            highlightDangerousLinks(dangerousLinksInEmail);
+          }
+        }
 
         const directMessage = {
           action: 'displayAutoScanResult',
