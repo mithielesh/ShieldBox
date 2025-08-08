@@ -8,57 +8,6 @@ let autoScanSettings = {
 // Track the visibility state of the floating panel
 let floatingPanelVisible = false;
 
-// Helper function for email classification based on extracted content
-function classifyEmailType(emailData) {
-  // Extract indicators from email data
-  const { subject, sender, senderEmail, body, hasAttachments, links, indicators } = emailData;
-
-  if (!indicators) {
-    return "unknown";
-  }
-
-  // Using the same logic as the backend's basic_email_check function
-  const scores = {
-    "phishing": indicators.phishingScore || 0,
-    "fraud": indicators.fraudScore || 0,
-    "spam": indicators.spamScore || 0,
-    "malware": indicators.malwareScore || 0
-  };
-
-  // Adjust scores based on additional indicators
-  if (indicators.sensitiveInfoRequested) {
-    scores.phishing += 2;
-  }
-
-  if (indicators.financialInfoRequested) {
-    scores.fraud += 2;
-  }
-
-  if (indicators.promotionalContent) {
-    scores.spam += 1;
-  }
-
-  if (indicators.shortenedUrls) {
-    scores.phishing += 1;
-  }
-
-  if (indicators.hasUrgentSubject) {
-    scores.phishing += 1;
-    scores.fraud += 1;
-  }
-
-  // Get category with highest score
-  const maxCategory = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-  const maxScore = scores[maxCategory];
-
-  // If the highest score is too low, consider it legitimate (same threshold as backend)
-  if (maxScore < 2) {
-    return "legitimate";
-  }
-
-  return maxCategory;
-}
-
 // Function to get threat details based on email type
 function getThreatDetails(emailType) {
   switch (emailType.toLowerCase()) {
@@ -338,19 +287,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 });
               })
               .catch(error => {
-                console.warn("[ShieldBox] Backend ML model failed, falling back to local classification:", error);
-
-                // Fallback to local classification only if backend fails
-                const emailType = classifyEmailType(response);
-                const threatDetails = getThreatDetails(emailType);
-                console.log(`[ShieldBox] Fallback local classification: ${emailType}`);
+                console.error("[ShieldBox] Backend ML model for manual scan failed:", error);
+                let errorMessage = "The backend analysis server is unavailable. Please try again later.";
+                if (error.name === 'AbortError') {
+                  errorMessage = "The analysis request timed out. The server might be busy.";
+                } else if (error.message && error.message.includes("Failed to fetch")) {
+                  errorMessage = "Could not connect to the analysis server. Please ensure it is running.";
+                }
 
                 try {
                   sendResponse({
-                    result: emailType,
-                    emailType: emailType,
-                    details: threatDetails,
-                    source: 'local_fallback'
+                    error: errorMessage,
+                    result: "error",
+                    emailType: "error",
+                    details: {
+                      title: "Scan Failed",
+                      description: errorMessage,
+                      recommendation: "Check your connection or try again later.",
+                      threatLevel: "unknown"
+                    },
+                    source: 'backend_error'
                   });
                 } catch (e) {
                   console.log("[ShieldBox] Could not send response for manual scan fallback, original sender likely gone.", e);
@@ -654,22 +610,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       console.error("[ShieldBox] Error in local scan:", err);
       console.log("[ShieldBox] Setting default local scan result due to error");
     }
+    // Capture the sender's tab ID to send the final result back
+    const senderTabId = sender.tab?.id;
 
     // Send immediate response with local analysis
-    const localResponse = {
+    const scanningResponse = {
       result: {
         url: processedUrl,
-        status: localStatus,
+        status: "scanning",
         timestamp: new Date().toISOString(),
-        details: localStatus === "phishing" ?
-          "Quick scan: This URL contains suspicious keywords often found in phishing sites. Running full analysis..." :
-          "Quick scan: No obvious suspicious patterns detected. Running full analysis...",
+        details: "Analyzing URL with ML model...",
         analysis_type: "local_quick_scan"
       }
     };
 
     // Send immediate response
-    sendResponse(localResponse);
+    sendResponse(scanningResponse);
 
     // Try to connect to backend API in the background with timeout
     // Use a wrapper to ensure we can safely make the API call
@@ -792,7 +748,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
 
         // Send updated analysis to the UI via message
-        chrome.runtime.sendMessage({
+        const updateMessage = {
           action: "updateScanResult",
           result: {
             url: data.url,
@@ -802,7 +758,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             timestamp: new Date().toISOString(),
             analysis_type: "ml_model"
           }
-        });
+        };
+
+        if (senderTabId) {
+          chrome.tabs.sendMessage(senderTabId, updateMessage, () => {
+            if (chrome.runtime.lastError) { /* Ignore error if tab is closed */ }
+          });
+        } else {
+          // Fallback for contexts without a tab (e.g., popup)
+          chrome.runtime.sendMessage(updateMessage, () => {
+            if (chrome.runtime.lastError) { /* Ignore error if popup is closed */ }
+          });
+        }
 
         console.log("[ShieldBox] ML analysis complete - sent update message to UI");
         // Note: We don't use sendResponse here because we already sent the immediate response
@@ -817,7 +784,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           "Backend server unavailable. Using local scan only.";
 
         // Send update that we're using local analysis only
-        chrome.runtime.sendMessage({
+        const fallbackMessage = {
           action: "updateScanResult",
           result: {
             url: message.data,
@@ -829,7 +796,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               `${errorMessage} No obvious threats detected.`,
             analysis_type: "local_only"
           }
-        });
+        };
+
+        if (senderTabId) {
+          chrome.tabs.sendMessage(senderTabId, fallbackMessage, () => {
+            if (chrome.runtime.lastError) { /* Ignore error if tab is closed */ }
+          });
+        } else {
+          chrome.runtime.sendMessage(fallbackMessage, () => {
+            if (chrome.runtime.lastError) { /* Ignore error if popup is closed */ }
+          });
+        }
       });
 
     // Keep the message channel open for async response
@@ -1177,68 +1154,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             email_status: data.email_status,
             link_count: data.link_count
           });
-          const suspiciousLinks = links.filter(link => {
-            const url = link.toLowerCase();
+        })
+        .catch((err) => {
+          console.error("[ShieldBox] Error during auto-scan:", err);
 
-            return ["login", "verify", "account", "secure", "bank", "update", "confirm", "password", "signin"].some(term => url.includes(term));
-          });
+          let resultMessage = "Auto-scan failed: Backend unavailable";
+          let displayStatus = "error";
+          let htmlContent = "<b>⚠️ Auto-Scan Failed</b><br>Could not connect to the analysis server.";
 
-          const status = suspiciousLinks.length > 0 ? "phishing" : "safe";
-          if (status === "phishing") {
-            htmlContent = "<b>⚠️ PHISHING DETECTED</b><br>Suspicious links found! (Local analysis)";
-            resultMessage = "Auto-scan: Potential phishing detected (local analysis - backend unavailable)";
-          } else {
-            htmlContent = "<b>✅ EMAIL SAFE</b><br>No threats detected. (Local analysis)";
-            resultMessage = "Auto-scan: No suspicious links found (local analysis - backend unavailable)";
+          if (err.name === 'AbortError') {
+            resultMessage = "Auto-scan timed out.";
+            htmlContent = "<b>⌛ Auto-Scan Timed Out</b><br>The server is taking too long to respond.";
           }
 
-          // Store the latest auto scan result in chrome.storage
-          // Use existing autoScanResult object if defined, otherwise create a new one
-          autoScanResult = typeof autoScanResult !== 'undefined' ? autoScanResult : {};
-          autoScanResult.message = resultMessage;
-          autoScanResult.status = status;
-          autoScanResult.htmlContent = htmlContent;
-          autoScanResult.timestamp = new Date().toISOString();
-          autoScanResult.linkCount = links.length;
-          autoScanResult.suspiciousLinkCount = suspiciousLinks.length;
-          autoScanResult.phishingLinks = suspiciousLinks;
-          autoScanResult.subject = emailData.subject || "Unknown subject";
-          autoScanResult.sender = emailData.sender || "Unknown sender";
-          autoScanResult.emailId = emailData.emailId || "";
-          autoScanResult.emailStatus = null;
-          autoScanResult.isLocalScan = true;
+          // Prepare a result object to send to the UI
+          const errorResult = {
+            message: resultMessage,
+            status: displayStatus,
+            htmlContent: htmlContent,
+            timestamp: new Date().toISOString(),
+            isError: true,
+            subject: emailData.subject || "Unknown subject",
+            sender: emailData.sender || "Unknown sender",
+            emailId: emailData.emailId || ""
+          };
 
-          chrome.storage.local.set({ latestAutoScanResult: autoScanResult }, () => {
-            console.log("[ShieldBox] Stored auto-scan result in chrome.storage (fallback)");
-          });
-
-          console.log("[ShieldBox] 📤 Sending fallback auto-scan result message to UI:", {
-            action: "displayAutoScanResult",
-            result: resultMessage,
-            status: status,
-            htmlContent: htmlContent
-          });
-
+          // Send message to update any open popups/panels
           chrome.runtime.sendMessage({
             action: "displayAutoScanResult",
             result: resultMessage,
-            status: status,
+            status: displayStatus,
             htmlContent: htmlContent,
-            data: autoScanResult
-          }, (response) => {
-            if (chrome.runtime.lastError) {
-              console.log('[ShieldBox] Chrome runtime error sending fallback auto-scan result:', chrome.runtime.lastError);
-            } else {
-              console.log('[ShieldBox] ✅ Fallback auto-scan result message sent successfully');
-            }
+            data: errorResult
+          }, () => {
+            if (chrome.runtime.lastError) { /* ignore */ }
           });
 
+          // Send a response back to the content script
           sendResponse({
-            result: status,
-            emailType: status,
-            htmlContent: htmlContent,
-            links: links,
-            isLocalScan: true
+            status: "error",
+            result: "error",
+            error: err.message
           });
         });
     });
