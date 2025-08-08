@@ -713,38 +713,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Add timestamp to the response
         data.timestamp = new Date().toISOString();
 
-        // Generate detailed response based on confidence level
-        if (data.confidence !== undefined) {
-          const confidencePercent = Math.round(data.confidence * 100);
-          if (data.status === "phishing") {
-            data.details = `WARNING: Potential phishing detected with ${confidencePercent}% confidence`;
-            // Add details about suspicious indicators
-            if (data.suspicious_keywords_found) {
-              data.details += "\n• Contains suspicious keywords typically used in phishing";
-            }
-            if (data.debug_info?.url_length > 75) {
-              data.details += "\n• Unusually long URL (common in phishing attempts)";
-            }
+        // Generate detailed response without confidence percentages
+        if (data.status === "phishing") {
+          data.details = "Warning: This URL shows signs of a phishing threat.";
 
-            // Add risk level based on confidence
-            if (data.confidence > 0.7) {
-              data.details += "\n\nHIGH RISK! Please avoid this website.";
-            } else if (data.confidence > 0.4) {
-              data.details += "\n\nMEDIUM RISK. Exercise caution with this website.";
-            } else {
-              data.details += "\n\nLOW RISK. Still, be careful with this website.";
-            }
+          // Add details about suspicious indicators
+          if (data.suspicious_keywords_found) {
+            data.details += "\n• Contains keywords often used in phishing.";
+          }
+          if (data.debug_info?.url_length > 75) {
+            data.details += "\n• The URL is unusually long, a common phishing tactic.";
+          }
+
+          // Add risk level recommendation based on confidence
+          if (data.confidence > 0.8) {
+            data.details += "\n\nRecommendation: HIGH RISK! Avoid this website.";
+          } else if (data.confidence > 0.5) {
+            data.details += "\n\nRecommendation: MEDIUM RISK. Exercise extreme caution.";
           } else {
-            data.details = `Our ML model verified this URL as safe with ${100 - confidencePercent}% confidence`;
-            // Note if there are any suspicious keywords despite being marked safe
-            if (data.suspicious_keywords_found) {
-              data.details += "\n\nNote: Contains some common phishing keywords, but structure appears legitimate. Still exercise caution.";
-            }
+            data.details += "\n\nRecommendation: LOW RISK, but be careful.";
           }
         } else {
-          data.details = data.status === "phishing" ?
-            "Our ML model detected phishing indicators in this URL" :
-            "Our ML model verified this URL as safe";
+          data.details = "This URL appears to be safe.";
+          // Note if there are any suspicious keywords despite being marked safe
+          if (data.suspicious_keywords_found) {
+            data.details += "\n\nNote: While the structure seems safe, it contains some suspicious keywords. Please exercise caution.";
+          }
         }
 
         // Send updated analysis to the UI via message
