@@ -1339,6 +1339,10 @@ function scanCurrentEmail(isManualTrigger = false) {
       result: 'Email detected but no content found',
       status: 'no-content',
       data: { timestamp: new Date().toISOString() }
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
+      }
     });
     return;
   }
@@ -1352,6 +1356,10 @@ function scanCurrentEmail(isManualTrigger = false) {
       result: 'Email opened but no body content to scan',
       status: 'no-content',
       data: { timestamp: new Date().toISOString() }
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
+      }
     });
     return;
   }
@@ -1371,6 +1379,10 @@ function scanCurrentEmail(isManualTrigger = false) {
         ...cachedResult.data,
         timestamp: new Date().toISOString(),
         cached: true
+      }
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
       }
     });
 
@@ -1418,6 +1430,10 @@ function scanCurrentEmail(isManualTrigger = false) {
         timestamp: new Date().toISOString(),
         previouslyScanned: true
       }
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
+      }
     });
 
     window.postMessage({
@@ -1455,6 +1471,10 @@ function scanCurrentEmail(isManualTrigger = false) {
       timestamp: new Date().toISOString(),
       bodyLength: emailData.body.length
     }
+  }, () => {
+    if (chrome.runtime.lastError) {
+      console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
+    }
   });
 
   // Also send directly to any listening UI components
@@ -1477,15 +1497,13 @@ function scanCurrentEmail(isManualTrigger = false) {
     action: 'scanAutoEmail',
     data: emailData
   }, (response) => {
-    console.log('[ShieldBox] 📬 Auto-scan response received from background:', response);
-
     if (chrome.runtime.lastError) {
-      console.error('[ShieldBox] ❌ Chrome runtime error in auto-scan callback:', chrome.runtime.lastError);
+      console.warn('[ShieldBox] scanAutoEmail sendMessage error:', chrome.runtime.lastError.message);
+      return;
     }
-
+    console.log('[ShieldBox] 📬 Auto-scan response received from background:', response);
     if (response) {
       console.log('[ShieldBox] ✅ Background processed auto-scan successfully');
-
       // If we got a response, also send the result directly to ensure UI updates
       if (response.status === 'done' && response.emailType) {
         console.log('[ShieldBox] 🔄 Sending auto-scan result directly to UI as backup');

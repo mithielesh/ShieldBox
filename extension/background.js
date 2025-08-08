@@ -446,12 +446,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           results: data.results,
           phishingCount: phishingUrls.length
         });
-
-        // If phishing URLs found, update badge with count
-        if (phishingUrls.length > 0) {
-          chrome.action.setBadgeText({ text: phishingUrls.length.toString() });
-          chrome.action.setBadgeBackgroundColor({ color: "#FF0000" });
-        }
+        // Badge update removed as per user request
       })
       .catch((err) => {
         console.error("[ShieldBox] Error in auto-scan:", err);
@@ -525,11 +520,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         priority: 2
       });
     }
-
-    // Update badge with phishing count
-    chrome.action.setBadgeText({ text: message.data.count.toString() });
-    chrome.action.setBadgeBackgroundColor({ color: "#FF0000" });
-
+    // Badge update removed as per user request
     sendResponse({ status: "warning_displayed" });
     return true;
   }
