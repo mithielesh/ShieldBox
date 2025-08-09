@@ -1,15 +1,38 @@
 function extractEmailDetails() {
-  // CRITICAL FIX 2: Find the main email container to scope our search.
+  // CRITICAL FIX: Find a reliable email container to scope our search.
   // This prevents grabbing details from the inbox list or other UI elements.
-  // The .nH.hx selector is a reliable container for an open email thread in Gmail.
-  const emailContainer = document.querySelector('.nH.hx');
+  const containerSelectors = [
+    '.nH.hx',         // Classic Gmail thread view
+    '.nH.bAw',        // Another Gmail view
+    '.Bs.nH.iY.bAt',  // Gmail thread container
+    '.h7',            // Alternative container for single messages
+    '.ha'             // Subject area container, good fallback
+  ];
+
+  let emailContainer = null;
+  for (const selector of containerSelectors) {
+    emailContainer = document.querySelector(selector);
+    if (emailContainer) {
+      console.log(`[emailParser.js] Found email container with selector: "${selector}"`);
+      break;
+    }
+  }
+
   if (!emailContainer) {
-    console.log('[emailParser.js] No open email container found (.nH.hx). Aborting extraction.');
+    console.log('[emailParser.js] No open email thread container found from list of selectors. Aborting extraction.');
     return {
       subject: null, sender: null, body: null, hasAttachments: false, links: [], indicators: {}
     };
   }
-  console.log('[emailParser.js] Found open email container, searching within it.');
+
+  // CRITICAL FIX: Identify the most recent/active message block within the thread.
+  // Gmail uses '.adn.ads' for individual messages. We'll target the last one.
+  // If none are found, we fall back to the main container.
+  const messageBlocks = emailContainer.querySelectorAll('.adn.ads');
+  const activeMessageBlock = messageBlocks.length > 0 ? messageBlocks[messageBlocks.length - 1] : emailContainer;
+  if (activeMessageBlock !== emailContainer) {
+    console.log('[emailParser.js] Found active message block within thread. Scoping search.');
+  }
 
 
   console.log('[emailParser.js] Starting email extraction within container...');
@@ -55,11 +78,14 @@ function extractEmailDetails() {
 
   console.log('[emailParser.js] Testing sender selectors...');
   for (const selector of senderSelectors) {
-    const element = emailContainer.querySelector(selector);
-    console.log(`[emailParser.js] Selector "${selector}":`, element ? `Found: "${element.innerText?.trim() || element.getAttribute('email') || ''}"` : 'Not found');
-    if (element) {
-      sender = element.innerText?.trim() || element.getAttribute('email') || "";
-      if (sender) {
+    // CRITICAL FIX 3: Use querySelectorAll and get the LAST element.
+    // This is now scoped to the active message block, making it much more accurate.
+    const elements = activeMessageBlock.querySelectorAll(selector);
+    console.log(`[emailParser.js] Selector "${selector}": Found ${elements.length} element(s)`);
+    if (elements.length > 0) {
+      const lastElement = elements[elements.length - 1];
+      sender = lastElement.innerText?.trim() || lastElement.getAttribute('email') || "";
+      if (sender) { // Check if we actually got a sender name/email
         console.log('[emailParser.js] Found sender with selector:', selector, ':', sender);
         break;
       }
@@ -81,13 +107,15 @@ function extractEmailDetails() {
 
   console.log('[emailParser.js] Testing body selectors...');
   for (const selector of bodySelectors) {
-    const element = emailContainer.querySelector(selector);
-    const text = element?.innerText?.trim() || "";
-    console.log(`[emailParser.js] Selector "${selector}":`, element ? `Found (length: ${text.length})` : 'Not found');
-    if (element && element.innerText) {
-      body = element.innerText.trim();
+    // CRITICAL FIX 4: Use querySelectorAll and get the LAST element for the body as well.
+    // This is also scoped to the active message block.
+    const elements = activeMessageBlock.querySelectorAll(selector);
+    console.log(`[emailParser.js] Selector "${selector}": Found ${elements.length} element(s)`);
+    if (elements.length > 0) {
+      const lastElement = elements[elements.length - 1];
+      body = lastElement.innerText?.trim() || "";
       if (body.length > 10) { // Only accept non-trivial content
-        console.log('[emailParser.js] Found body with selector:', selector, ', length:', body.length);
+        console.log('[emailParser.js] Found body with selector:', selector, ', length:', body.length, '(scoped to active block)');
         break;
       }
     }

@@ -778,7 +778,7 @@ function processAutoScanResults(results) {
   const phishingUrls = results.filter(result => result.status === 'phishing');
 
   if (phishingUrls.length > 0) {
-    console.warn('[ShieldBox] Detected phishing URLs:', phishingUrls.map(p => p.url));
+   console.warn('[ShieldBox] Detected phishing URLs:', phishingUrls.map(p => p.url));
 
     // Highlight the dangerous links on the page
     highlightDangerousLinks(phishingUrls.map(result => result.url));
