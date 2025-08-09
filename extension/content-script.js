@@ -778,7 +778,7 @@ function processAutoScanResults(results) {
   const phishingUrls = results.filter(result => result.status === 'phishing');
 
   if (phishingUrls.length > 0) {
-    console.warn('[ShieldBox] Detected phishing URLs:', phishingUrls);
+    console.warn('[ShieldBox] Detected phishing URLs:', phishingUrls.map(p => p.url));
 
     // Highlight the dangerous links on the page
     highlightDangerousLinks(phishingUrls.map(result => result.url));
@@ -1339,10 +1339,6 @@ function scanCurrentEmail(isManualTrigger = false) {
       result: 'Email detected but no content found',
       status: 'no-content',
       data: { timestamp: new Date().toISOString() }
-    }, () => {
-      if (chrome.runtime.lastError) {
-        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
-      }
     });
     return;
   }
@@ -1356,10 +1352,6 @@ function scanCurrentEmail(isManualTrigger = false) {
       result: 'Email opened but no body content to scan',
       status: 'no-content',
       data: { timestamp: new Date().toISOString() }
-    }, () => {
-      if (chrome.runtime.lastError) {
-        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
-      }
     });
     return;
   }
@@ -1379,10 +1371,6 @@ function scanCurrentEmail(isManualTrigger = false) {
         ...cachedResult.data,
         timestamp: new Date().toISOString(),
         cached: true
-      }
-    }, () => {
-      if (chrome.runtime.lastError) {
-        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
       }
     });
 
@@ -1430,10 +1418,6 @@ function scanCurrentEmail(isManualTrigger = false) {
         timestamp: new Date().toISOString(),
         previouslyScanned: true
       }
-    }, () => {
-      if (chrome.runtime.lastError) {
-        console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
-      }
     });
 
     window.postMessage({
@@ -1470,10 +1454,6 @@ function scanCurrentEmail(isManualTrigger = false) {
       sender: emailData.sender,
       timestamp: new Date().toISOString(),
       bodyLength: emailData.body.length
-    }
-  }, () => {
-    if (chrome.runtime.lastError) {
-      console.warn('[ShieldBox] displayAutoScanResult sendMessage error:', chrome.runtime.lastError.message);
     }
   });
 
