@@ -1,3 +1,23 @@
+## 🔮 Future Work
+
+We plan to extend ShieldBox with IoT-based alerting. The system will connect to an ESP32 microcontroller, which will relay email security alerts to:
+- A set of LEDs (for visual threat indication)
+- A voice module (for spoken warnings)
+- An LCD display (for real-time alert messages)
+
+This integration will enable physical, real-world notifications for critical email threats, making ShieldBox even more effective for high-security environments.
+## 🧩 Testcases & Debugging
+
+The `testcases/` folder contains a comprehensive set of scripts and HTML files used to debug, validate, and improve the ShieldBox classification system. It includes:
+- Python scripts for testing email and URL classification, edge cases, and fraud/spam/malware detection
+- HTML/JS files for simulating extension UI and Chrome integration
+- Specialized tests for error handling, toggle features, and category-specific scenarios
+
+Use these testcases to:
+- Debug and improve model classification
+- Test new features and fixes
+- Validate extension and backend integration
+- Reproduce and diagnose classification or extraction errors
 # ShieldBox - Advanced Email & URL Security Chrome Extension
 
 ShieldBox is a comprehensive Chrome extension that protects users from phishing attacks, fraudulent emails, spam, and malware by analyzing both URLs and email content in real-time using advanced machine learning algorithms.
@@ -34,29 +54,57 @@ ShieldBox is a comprehensive Chrome extension that protects users from phishing 
 
 ## 📁 Project Structure
 
+
 ```
 ShieldBox/
-├── Backend/                     # Python ML backend
-│   ├── dataset_phishing.csv     # Training dataset
-│   ├── feature_extractor.py     # ML feature extraction
-│   ├── feature_scaler.pkl       # Trained feature scaler
-│   ├── main.py                  # FastAPI backend server
-│   ├── phishing_model.pkl       # Trained ML model
-│   ├── phishing_model_package.pkl
-│   ├── requirements.txt         # Python dependencies
-│   └── train_model.py           # Model training script
+├── Backend/                         # Python ML backend
+│   ├── dataset_phishing.csv         # Phishing URL training dataset (not included)
+│   ├── [other email datasets].csv   # Email datasets (not included)
+│   ├── feature_extractor.py         # URL feature extraction (phishing model)
+│   ├── email_feature_extractor.py   # Email feature extraction (email model)
+│   ├── feature_scaler.pkl           # Trained feature scaler (phishing model)
+│   ├── main.py                      # FastAPI backend server
+│   ├── phishing_model.pkl           # Trained phishing URL model
+│   ├── phishing_model_package.pkl   # Packaged phishing model
+│   ├── email_model.pkl              # Trained email classification model
+│   ├── requirements.txt             # Python dependencies
+│   ├── train_model.py               # Phishing URL model training script
+│   └── train_email_model.py         # Email classification model training script
 │
-└── extension/                   # Chrome extension
-    ├── background.js            # Extension background service
-    ├── content-script.js        # Page injection & Gmail integration
-    ├── emailParser.js           # Email content extraction
-    ├── floatingpanel.html       # Security panel UI structure
-    ├── floatingpanel.js         # Panel logic & interactions
-    ├── manifest.json            # Extension configuration
-    ├── popup.html               # Extension popup interface
-    ├── popup.js                 # Popup functionality
-    └── style.css                # Complete styling system
+└── extension/                       # Chrome extension
+   ├── background.js                # Extension background service
+   ├── content-script.js            # Page injection & Gmail integration
+   ├── emailParser.js               # Email content extraction
+   ├── emailUtils.js                # Email utility/helper functions
+   ├── emailWarning.js              # Warning/notification logic for emails
+   ├── floatingpanel.html           # Security panel UI structure
+   ├── floatingpanel.js             # Panel logic & interactions
+   ├── icons/                       # Extension icons (16x16, 48x48, 128x128)
+   ├── manifest.json                # Extension configuration
+   ├── popup.html                   # Extension popup interface
+   ├── popup_simple.html            # Minimal/simple popup UI
+   ├── popup.js                     # Popup functionality
+   └── style.css                    # Complete styling system
 ```
+
+## 📊 Model Training & Validation
+
+### Phishing URL Model
+- **Model:** XGBoost Classifier (see `Backend/train_model.py`)
+- **Feature extraction:** See `feature_extractor.py`
+- **Dataset split:** 80% training, 20% validation (stratified, random_state=42)
+- **Preprocessing:** StandardScaler for feature normalization
+- **Validation set:** The 20% test split (`X_test`, `y_test`) is used for model validation and evaluation.
+
+### Email Classification Model
+- **Model:** RandomForest (OneVsRest, with TF-IDF features) (see `Backend/train_email_model.py`)
+- **Feature extraction:** See `email_feature_extractor.py` (subject + body, normalized, URLs replaced, whitespace cleaned)
+- **Categories:** phishing, spam, legitimate, malware, scam, spear_phishing, fraudulent, safe
+- **Dataset split:** 80% training, 20% validation (stratified, random_state=42)
+- **Validation set:** The 20% test split is used for model validation and evaluation.
+
+## 📦 Dataset
+**Note:** The training datasets are not included in this repository. Please download the required datasets and place them in the `Backend/` directory. the datasets are publicly available Kaggle datasets.
 
 ## 🔍 Email Classification System
 
@@ -107,7 +155,7 @@ ShieldBox uses advanced machine learning to classify emails into distinct securi
    ```bash
    python main.py
    ```
-   The server will start on `http://localhost:8000`
+   The server will start on `http://localhost:5000`
 
 ### **Chrome Extension Installation**
 1. **Open Chrome Extensions Page**
